@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jioha\\\\dev\\\\asset-management\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(Format-Table)",
+      "PowerShell($items = Get-ChildItem -Path \"C:\\\\Users\\\\jioha\\\\dev\\\\asset-management\" -Force -ErrorAction SilentlyContinue; if \\($items\\) { $items | ForEach-Object { \"$\\($_.Mode\\) $\\($_.Name\\)\" } } else { \"No items found\" })",
+      "PowerShell(\\(Get-ChildItem -Path \"C:\\\\Users\\\\jioha\\\\dev\\\\asset-management\" -Force -ErrorAction SilentlyContinue | Measure-Object\\).Count)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jioha\\\\dev\\\\asset-management\\\\.claude\" -Force -Recurse | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\"C:\\\\Users\\\\jioha\\\\dev\\\\asset-management\"\\), \".\" })"
+    ]
+  }
+}
