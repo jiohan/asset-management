@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440" />
+<title>Monimo — 대시보드</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --indigo: #4f46e5;
+    --indigo-700: #4338ca;
+    --indigo-50: #eef2ff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --blue-500: #3b82f6;
+    --green-500: #22c55e;
+    --amber-500: #f59e0b;
+  }
+  html, body {
+    font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'tnum' 1;
+  }
+  .num, .mono { font-variant-numeric: tabular-nums; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; font-size:13px; color:var(--gray-700); cursor:pointer; }
+  .nav-item:hover { background: var(--gray-100); }
+  .nav-item.active { background: var(--indigo-50); color: var(--indigo); font-weight:600; }
+  .nav-item .ico { width:16px; height:16px; }
+  .acc-dot { width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:8px; }
+
+  .btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:8px; font-size:13px; font-weight:500; border:1px solid var(--gray-200); background:#fff; color:var(--gray-700); }
+  .btn:hover { background: var(--gray-50); }
+  .btn-primary { background:var(--indigo); color:#fff; border-color:var(--indigo); }
+  .btn-primary:hover { background:var(--indigo-700); border-color:var(--indigo-700); }
+  .btn-ghost { border: 0; }
+
+  .field { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--gray-200); background:#fff; border-radius:8px; height:32px; padding:0 10px; font-size:13px; color:var(--gray-700); }
+  .field svg { width:14px; height:14px; color:var(--gray-400); }
+  .field input, .field select { background:transparent; border:0; outline:0; font:inherit; color:inherit; }
+
+  .card { background:#fff; border:1px solid var(--gray-200); border-radius:12px; }
+  .card-h { padding:14px 18px; border-bottom:1px solid var(--gray-100); display:flex; align-items:center; gap:8px; }
+  .card-h h3 { font-size:14px; font-weight:600; color:var(--gray-900); }
+  .card-b { padding:18px; }
+
+  .seg { display:inline-flex; background: var(--gray-100); padding:2px; border-radius:8px; font-size:12px; }
+  .seg button { padding:4px 10px; border-radius:6px; color:var(--gray-500); font-weight:500; }
+  .seg button.is-on { background:#fff; color:var(--gray-900); box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+
+  .mini-bar { height:6px; border-radius:999px; background:var(--gray-100); overflow:hidden; }
+  .mini-bar > span { display:block; height:100%; background: var(--indigo); }
+
+  .scroll::-webkit-scrollbar { width:10px; height:10px; }
+  .scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:999px; border:2px solid var(--gray-50); }
+
+  kbd { font-family:'JetBrains Mono', monospace; font-size:10.5px; background:var(--gray-100); border:1px solid var(--gray-200); border-bottom-width:2px; border-radius:4px; padding:1px 5px; color:var(--gray-700); }
+
+  /* 카테고리 막대 그래프 */
+  .cat-row { display:grid; grid-template-columns: 24px 1fr 88px 56px; gap:10px; align-items:center; padding:8px 0; }
+  .cat-bar { height:6px; border-radius:999px; background:var(--gray-100); position:relative; overflow:hidden; }
+  .cat-bar > span { position:absolute; left:0; top:0; bottom:0; border-radius:999px; }
+
+  /* 도넛 */
+  .donut-legend li { display:flex; align-items:center; gap:8px; padding:6px 0; font-size:12.5px; }
+  .donut-legend .lk { width:8px; height:8px; border-radius:2px; }
+
+  /* 일별 칩 */
+  .day-strip { display:grid; grid-template-columns:repeat(31, 1fr); gap:3px; }
+  .day-strip .d { height:34px; border-radius:4px; background:var(--gray-100); position:relative; }
+  .day-strip .d.t-l { background:#e0e7ff; }
+  .day-strip .d.t-m { background:#a5b4fc; }
+  .day-strip .d.t-h { background:#6366f1; }
+  .day-strip .d.t-x { background:#312e81; }
+  .day-strip .d.today::after { content:''; position:absolute; inset:0; border:1.5px solid var(--gray-900); border-radius:4px; }
+
+  /* 라인 차트 자리 */
+  .line-svg path.area { fill:url(#area); }
+  .line-svg path.line { fill:none; stroke: var(--indigo); stroke-width:2; }
+  .line-svg circle { fill:#fff; stroke: var(--indigo); stroke-width:2; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-[232px] shrink-0 bg-white border-r border-gray-200 flex flex-col">
+    <div class="px-5 h-14 flex items-center gap-2 border-b border-gray-200">
+      <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-white"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="font-bold text-[15px] tracking-tight">Monimo</div>
+      <span class="ml-auto text-[10px] text-gray-400 font-medium">v1</span>
+    </div>
+
+    <div class="p-3">
+      <button class="btn btn-primary w-full justify-center">
+        <svg viewBox="0 0 24 24" fill="none" class="w-3.5 h-3.5"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        새 거래 추가
+      </button>
+    </div>
+
+    <nav class="px-3 flex flex-col gap-0.5">
+      <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-2 mb-1.5">메인</div>
+      <a class="nav-item" href="Monimo Ledger.html">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        거래 내역
+        <span class="ml-auto text-[11px] text-gray-400 num">428</span>
+      </a>
+      <a class="nav-item active" href="Monimo Dashboard.html">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M3 13l4-4 4 4 7-7M14 6h7v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        대시보드
+      </a>
+      <a class="nav-item" href="Monimo Budget.html">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        예산
+      </a>
+      <a class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.6"/></svg>
+        계좌
+      </a>
+      <a class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        카테고리
+      </a>
+
+      <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-5 mb-1.5">계좌</div>
+      <a class="nav-item"><span class="acc-dot" style="background:#6366f1"></span> 카카오뱅크 체크 <span class="ml-auto mono text-[11px] text-gray-500">1,284,200</span></a>
+      <a class="nav-item"><span class="acc-dot" style="background:#f59e0b"></span> 신한 신용카드 <span class="ml-auto mono text-[11px] text-red-500">−842,500</span></a>
+      <a class="nav-item"><span class="acc-dot" style="background:#10b981"></span> 토스뱅크 적금 <span class="ml-auto mono text-[11px] text-gray-500">3,000,000</span></a>
+      <a class="nav-item"><span class="acc-dot" style="background:#6b7280"></span> 현금 지갑 <span class="ml-auto mono text-[11px] text-gray-500">42,000</span></a>
+    </nav>
+
+    <div class="mt-auto p-3 border-t border-gray-200">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[12px] font-semibold">JS</div>
+        <div class="min-w-0">
+          <div class="text-[12px] font-semibold truncate">정수민</div>
+          <div class="text-[11px] text-gray-500 truncate">soomin@example.com</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="flex-1 min-w-0 flex flex-col">
+
+    <!-- Top bar -->
+    <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <button class="btn btn-ghost px-1.5"><svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <div class="text-[15px] font-semibold">2026년 5월</div>
+        <button class="btn btn-ghost px-1.5"><svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <button class="btn btn-ghost text-[12px] text-gray-500">오늘</button>
+      </div>
+      <div class="h-5 w-px bg-gray-200 mx-2"></div>
+      <div class="text-[13px] text-gray-500">5월 1일 — 5월 7일까지의 활동 요약</div>
+      <div class="ml-auto flex items-center gap-1.5">
+        <div class="seg">
+          <button class="is-on">월간</button>
+          <button>주간</button>
+          <button>연간</button>
+        </div>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" class="w-3.5 h-3.5"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>리포트</button>
+      </div>
+    </header>
+
+    <div class="flex-1 min-h-0 overflow-auto scroll p-6 space-y-5">
+
+      <!-- 상단 요약 카드 -->
+      <section class="grid grid-cols-4 gap-3">
+        <div class="card p-4">
+          <div class="flex items-center justify-between">
+            <div class="text-[12px] text-gray-500 font-medium">이번 달 수입</div>
+            <span class="text-[11px] text-blue-500 font-medium">+12.4%</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1">
+            <div class="text-[24px] font-bold mono text-blue-500">4,820,000</div>
+            <div class="text-[12px] text-gray-400">원</div>
+          </div>
+          <div class="text-[11px] text-gray-400 mt-1">3건 · 월급, 부수입</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between">
+            <div class="text-[12px] text-gray-500 font-medium">이번 달 지출</div>
+            <span class="text-[11px] text-red-500 font-medium">+5.1%</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1">
+            <div class="text-[24px] font-bold mono text-red-500">2,184,300</div>
+            <div class="text-[12px] text-gray-400">원</div>
+          </div>
+          <div class="text-[11px] text-gray-400 mt-1">87건 · 일평균 311,400원</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between">
+            <div class="text-[12px] text-gray-500 font-medium">잔여 예산</div>
+            <span class="text-[11px] text-gray-500 font-medium">예산 3,000,000</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1">
+            <div class="text-[24px] font-bold mono text-gray-900">815,700</div>
+            <div class="text-[12px] text-gray-400">원</div>
+          </div>
+          <div class="mini-bar mt-3"><span style="width:72.8%"></span></div>
+          <div class="text-[11px] text-gray-400 mt-1.5">72.8% 사용 · 23일 남음</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between">
+            <div class="text-[12px] text-gray-500 font-medium">순자산</div>
+            <span class="text-[11px] text-green-500 font-medium">+2,635,700</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1">
+            <div class="text-[24px] font-bold mono text-gray-900">3,483,700</div>
+            <div class="text-[12px] text-gray-400">원</div>
+          </div>
+          <div class="text-[11px] text-gray-400 mt-1">계좌 4개 · 이체 12건 제외</div>
+        </div>
+      </section>
+
+      <!-- 6개월 추이 + 카테고리 도넛 -->
+      <section class="grid grid-cols-3 gap-3">
+        <!-- Trend -->
+        <div class="card col-span-2">
+          <div class="card-h">
+            <h3>최근 6개월 수입 · 지출</h3>
+            <div class="ml-auto flex items-center gap-3 text-[12px] text-gray-500">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-blue-500"></span>수입</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-red-500"></span>지출</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-indigo-600"></span>저축</span>
+            </div>
+          </div>
+          <div class="card-b">
+            <svg viewBox="0 0 720 240" class="line-svg w-full h-[240px]">
+              <defs>
+                <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6366f1" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- gridlines -->
+              <g stroke="#f3f4f6" stroke-width="1">
+                <line x1="40" y1="40"  x2="700" y2="40"/>
+                <line x1="40" y1="100" x2="700" y2="100"/>
+                <line x1="40" y1="160" x2="700" y2="160"/>
+                <line x1="40" y1="220" x2="700" y2="220"/>
+              </g>
+              <!-- y labels -->
+              <g fill="#9ca3af" font-size="10" font-family="JetBrains Mono">
+                <text x="0" y="44">600만</text>
+                <text x="0" y="104">400만</text>
+                <text x="0" y="164">200만</text>
+                <text x="0" y="224">0</text>
+              </g>
+              <!-- x labels -->
+              <g fill="#9ca3af" font-size="11" font-family="Pretendard">
+                <text x="80"  y="236" text-anchor="middle">12월</text>
+                <text x="190" y="236" text-anchor="middle">1월</text>
+                <text x="300" y="236" text-anchor="middle">2월</text>
+                <text x="410" y="236" text-anchor="middle">3월</text>
+                <text x="520" y="236" text-anchor="middle">4월</text>
+                <text x="630" y="236" text-anchor="middle">5월</text>
+              </g>
+              <!-- 수입 bars -->
+              <g fill="#3b82f6" opacity="0.85">
+                <rect x="60"  y="76"  width="14" height="144" rx="2"/>
+                <rect x="170" y="64"  width="14" height="156" rx="2"/>
+                <rect x="280" y="80"  width="14" height="140" rx="2"/>
+                <rect x="390" y="60"  width="14" height="160" rx="2"/>
+                <rect x="500" y="58"  width="14" height="162" rx="2"/>
+                <rect x="610" y="56"  width="14" height="164" rx="2"/>
+              </g>
+              <!-- 지출 bars -->
+              <g fill="#ef4444" opacity="0.85">
+                <rect x="76"  y="138" width="14" height="82"  rx="2"/>
+                <rect x="186" y="124" width="14" height="96"  rx="2"/>
+                <rect x="296" y="118" width="14" height="102" rx="2"/>
+                <rect x="406" y="132" width="14" height="88"  rx="2"/>
+                <rect x="516" y="128" width="14" height="92"  rx="2"/>
+                <rect x="626" y="148" width="14" height="72"  rx="2"/>
+              </g>
+              <!-- 저축 라인 (수입-지출) -->
+              <path class="area" d="M81,154 L191,138 L301,144 L411,128 L521,124 L631,108 L631,220 L81,220 Z"/>
+              <path class="line" d="M81,154 L191,138 L301,144 L411,128 L521,124 L631,108"/>
+              <g>
+                <circle cx="81" cy="154" r="3"/>
+                <circle cx="191" cy="138" r="3"/>
+                <circle cx="301" cy="144" r="3"/>
+                <circle cx="411" cy="128" r="3"/>
+                <circle cx="521" cy="124" r="3"/>
+                <circle cx="631" cy="108" r="4" fill="#4f46e5" stroke="#fff"/>
+              </g>
+              <!-- 5월 강조 라벨 -->
+              <g>
+                <rect x="592" y="78" width="78" height="22" rx="5" fill="#111827"/>
+                <text x="631" y="93" font-size="11" font-family="JetBrains Mono" fill="#fff" text-anchor="middle">+2,635,700</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Donut -->
+        <div class="card">
+          <div class="card-h"><h3>카테고리별 지출</h3></div>
+          <div class="card-b">
+            <div class="flex items-center justify-center">
+              <!-- 도넛 (CSS conic) -->
+              <div class="relative" style="width:180px; height:180px;">
+                <div style="
+                  width:180px; height:180px; border-radius:999px;
+                  background: conic-gradient(
+                    #6366f1 0 28%,
+                    #f59e0b 28% 46%,
+                    #ef4444 46% 60%,
+                    #3b82f6 60% 72%,
+                    #10b981 72% 82%,
+                    #8b5cf6 82% 90%,
+                    #ec4899 90% 96%,
+                    #6b7280 96% 100%
+                  );
+                "></div>
+                <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center">
+                  <div class="text-[10px] text-gray-400 uppercase tracking-wider">총 지출</div>
+                  <div class="mono font-bold text-[18px]">2,184,300</div>
+                  <div class="text-[11px] text-gray-400">원 · 87건</div>
+                </div>
+              </div>
+            </div>
+
+            <ul class="donut-legend mt-3">
+              <li><span class="lk" style="background:#6366f1"></span><span>식비</span><span class="ml-auto mono text-gray-500">611,604</span><span class="ml-2 text-[11px] text-gray-400 num">28%</span></li>
+              <li><span class="lk" style="background:#f59e0b"></span><span>주거·공과금</span><span class="ml-auto mono text-gray-500">393,174</span><span class="ml-2 text-[11px] text-gray-400 num">18%</span></li>
+              <li><span class="lk" style="background:#ef4444"></span><span>쇼핑</span><span class="ml-auto mono text-gray-500">305,802</span><span class="ml-2 text-[11px] text-gray-400 num">14%</span></li>
+              <li><span class="lk" style="background:#3b82f6"></span><span>의료·건강</span><span class="ml-auto mono text-gray-500">262,116</span><span class="ml-2 text-[11px] text-gray-400 num">12%</span></li>
+              <li><span class="lk" style="background:#10b981"></span><span>문화·여가</span><span class="ml-auto mono text-gray-500">218,430</span><span class="ml-2 text-[11px] text-gray-400 num">10%</span></li>
+              <li><span class="lk" style="background:#8b5cf6"></span><span>카페·간식</span><span class="ml-auto mono text-gray-500">174,744</span><span class="ml-2 text-[11px] text-gray-400 num">8%</span></li>
+              <li><span class="lk" style="background:#6b7280"></span><span>기타 (3개)</span><span class="ml-auto mono text-gray-500">218,430</span><span class="ml-2 text-[11px] text-gray-400 num">10%</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 카테고리 vs 예산 + 일별 히트맵 -->
+      <section class="grid grid-cols-3 gap-3">
+        <!-- 카테고리 vs 예산 -->
+        <div class="card col-span-2">
+          <div class="card-h">
+            <h3>카테고리 예산 사용률</h3>
+            <a href="Monimo Budget.html" class="ml-auto text-[12px] text-indigo-600 hover:underline">예산 편집 →</a>
+          </div>
+          <div class="card-b">
+            <div class="space-y-1">
+              <div class="cat-row">
+                <span class="text-[16px]">🍚</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">식비</span><span class="text-[11px] text-gray-400">611,604 / 700,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:87%; background:#6366f1"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-gray-700">87%</div>
+                <div class="text-[12px] text-gray-500 text-right">정상</div>
+              </div>
+              <div class="cat-row">
+                <span class="text-[16px]">🏠</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">주거·공과금</span><span class="text-[11px] text-gray-400">1,022,300 / 1,000,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:100%; background:#ef4444"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-red-600">102%</div>
+                <div class="text-[12px] text-red-600 text-right font-medium">초과</div>
+              </div>
+              <div class="cat-row">
+                <span class="text-[16px]">🛍️</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">쇼핑</span><span class="text-[11px] text-gray-400">305,802 / 300,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:100%; background:#ef4444"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-red-600">102%</div>
+                <div class="text-[12px] text-red-600 text-right font-medium">초과</div>
+              </div>
+              <div class="cat-row">
+                <span class="text-[16px]">🚌</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">교통</span><span class="text-[11px] text-gray-400">87,200 / 150,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:58%; background:#10b981"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-gray-700">58%</div>
+                <div class="text-[12px] text-green-500 text-right">여유</div>
+              </div>
+              <div class="cat-row">
+                <span class="text-[16px]">🎬</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">문화·여가</span><span class="text-[11px] text-gray-400">218,430 / 250,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:87%; background:#6366f1"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-gray-700">87%</div>
+                <div class="text-[12px] text-gray-500 text-right">정상</div>
+              </div>
+              <div class="cat-row">
+                <span class="text-[16px]">☕</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">카페·간식</span><span class="text-[11px] text-gray-400">174,744 / 150,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:100%; background:#f59e0b"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-amber-500">116%</div>
+                <div class="text-[12px] text-amber-500 text-right font-medium">주의</div>
+              </div>
+              <div class="cat-row">
+                <span class="text-[16px]">💊</span>
+                <div>
+                  <div class="flex items-baseline gap-2"><span class="text-[13px] font-medium">의료·건강</span><span class="text-[11px] text-gray-400">262,116 / 300,000</span></div>
+                  <div class="cat-bar mt-1.5"><span style="width:87%; background:#6366f1"></span></div>
+                </div>
+                <div class="mono text-[12.5px] text-right text-gray-700">87%</div>
+                <div class="text-[12px] text-gray-500 text-right">정상</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 일별 -->
+        <div class="card">
+          <div class="card-h"><h3>일별 지출 강도</h3></div>
+          <div class="card-b">
+            <div class="day-strip">
+              <div class="d t-x"><span class="absolute bottom-0.5 left-0 right-0 text-center text-[9px] mono text-white/90">1</span></div>
+              <div class="d"></div>
+              <div class="d t-h"></div>
+              <div class="d t-l"></div>
+              <div class="d t-m"></div>
+              <div class="d t-l"></div>
+              <div class="d t-l today"><span class="absolute bottom-0.5 left-0 right-0 text-center text-[9px] mono">7</span></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+              <div class="d"></div>
+            </div>
+            <div class="flex items-center justify-between mt-3 text-[11px] text-gray-400">
+              <span>적음</span>
+              <div class="flex gap-1">
+                <span class="w-3 h-3 rounded-sm bg-gray-100"></span>
+                <span class="w-3 h-3 rounded-sm" style="background:#e0e7ff"></span>
+                <span class="w-3 h-3 rounded-sm" style="background:#a5b4fc"></span>
+                <span class="w-3 h-3 rounded-sm" style="background:#6366f1"></span>
+                <span class="w-3 h-3 rounded-sm" style="background:#312e81"></span>
+              </div>
+              <span>많음</span>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-gray-100 space-y-2">
+              <div class="flex justify-between text-[12.5px]"><span class="text-gray-500">최대 지출일</span><span class="mono">5월 1일 · <span class="text-red-500">1,032,800</span></span></div>
+              <div class="flex justify-between text-[12.5px]"><span class="text-gray-500">무지출일</span><span class="mono">2일 · 4일</span></div>
+              <div class="flex justify-between text-[12.5px]"><span class="text-gray-500">일평균</span><span class="mono">311,471원</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 최근 거래 + 인사이트 -->
+      <section class="grid grid-cols-3 gap-3">
+        <div class="card col-span-2">
+          <div class="card-h">
+            <h3>최근 거래</h3>
+            <a href="Monimo Ledger.html" class="ml-auto text-[12px] text-indigo-600 hover:underline">전체 보기 →</a>
+          </div>
+          <div class="card-b !p-0">
+            <div class="divide-y divide-gray-100">
+              <div class="flex items-center px-5 py-3 gap-3 hover:bg-gray-50">
+                <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-[16px]">🍚</div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[13px] font-medium truncate">점심 — 본가 김치찌개</div>
+                  <div class="text-[11.5px] text-gray-500">식비 · 신한 신용카드 · 오늘 12:34</div>
+                </div>
+                <div class="mono text-[14px] font-semibold text-red-500">−9,500</div>
+              </div>
+              <div class="flex items-center px-5 py-3 gap-3 hover:bg-gray-50">
+                <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-[16px]">☕</div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[13px] font-medium truncate">스타벅스 — 아이스 아메리카노 T</div>
+                  <div class="text-[11.5px] text-gray-500">카페·간식 · 신한 신용카드 · 오늘 09:12</div>
+                </div>
+                <div class="mono text-[14px] font-semibold text-red-500">−4,800</div>
+              </div>
+              <div class="flex items-center px-5 py-3 gap-3 hover:bg-gray-50">
+                <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-[16px]">🚌</div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[13px] font-medium truncate">지하철 2호선</div>
+                  <div class="text-[11.5px] text-gray-500">교통 · 카카오뱅크 체크 · 오늘 08:24</div>
+                </div>
+                <div class="mono text-[14px] font-semibold text-red-500">−1,500</div>
+              </div>
+              <div class="flex items-center px-5 py-3 gap-3 hover:bg-gray-50">
+                <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-[16px]">🛍️</div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[13px] font-medium truncate">무신사 — 린넨 셔츠</div>
+                  <div class="text-[11.5px] text-gray-500">쇼핑 · 신한 신용카드 · 오늘 00:48</div>
+                </div>
+                <div class="mono text-[14px] font-semibold text-red-500">−27,000</div>
+              </div>
+              <div class="flex items-center px-5 py-3 gap-3 hover:bg-gray-50">
+                <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-[16px]">💵</div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[13px] font-medium truncate">4월 급여 — (주)오렌지컴퍼니</div>
+                  <div class="text-[11.5px] text-gray-500">월급 · 카카오뱅크 체크 · 5월 1일</div>
+                </div>
+                <div class="mono text-[14px] font-semibold text-blue-500">+4,520,000</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>이번 달 인사이트</h3></div>
+          <div class="card-b space-y-3">
+            <div class="rounded-lg bg-red-50 border border-red-100 p-3">
+              <div class="flex items-center gap-2 text-red-600 text-[12.5px] font-semibold">
+                <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M12 9v4M12 17h.01M4 19h16L12 4 4 19z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                예산 초과 항목 2개
+              </div>
+              <div class="text-[12px] text-gray-700 mt-1.5 leading-relaxed">
+                <span class="font-medium">주거·공과금</span>(+22,300원), <span class="font-medium">쇼핑</span>(+5,802원)이 예산을 초과했습니다.
+              </div>
+            </div>
+            <div class="rounded-lg bg-amber-50 border border-amber-100 p-3">
+              <div class="flex items-center gap-2 text-amber-600 text-[12.5px] font-semibold">
+                <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                카페·간식 페이스 주의
+              </div>
+              <div class="text-[12px] text-gray-700 mt-1.5 leading-relaxed">
+                7일 만에 예산의 116%를 사용했습니다. 이 페이스라면 월말에 약 <span class="font-medium mono">773,000원</span>이 예상됩니다.
+              </div>
+            </div>
+            <div class="rounded-lg bg-indigo-50 border border-indigo-100 p-3">
+              <div class="flex items-center gap-2 text-indigo-700 text-[12.5px] font-semibold">
+                <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M12 3v18M5 10l7-7 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                저축률 사상 최고
+              </div>
+              <div class="text-[12px] text-gray-700 mt-1.5 leading-relaxed">
+                이번 달 저축률은 <span class="font-medium mono">54.7%</span>로 최근 6개월 중 가장 높습니다.
+              </div>
+            </div>
+            <div class="rounded-lg bg-gray-50 border border-gray-200 p-3">
+              <div class="flex items-center gap-2 text-gray-700 text-[12.5px] font-semibold">
+                <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M3 17l6-6 4 4 8-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                일평균 지출
+              </div>
+              <div class="text-[12px] text-gray-600 mt-1.5 leading-relaxed">
+                4월 일평균 <span class="mono">328,400원</span> → 5월 <span class="mono">311,471원</span>. 5.1% 감소.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
