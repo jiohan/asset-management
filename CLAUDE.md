@@ -53,3 +53,4 @@ src/
 - `docs/architecture.md` — DB 스키마, Supabase 테이블 구조
 - `docs/features.md` — MVP 기능 명세
 - `docs/design-system.md` — UI 색상·컴포넌트 패턴
+- `docs/phase.md` — 전체 개발 단계 순서 (Phase 1~9)

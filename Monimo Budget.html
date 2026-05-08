@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440" />
+<title>Monimo — 예산</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --indigo:#4f46e5; --indigo-700:#4338ca; --indigo-50:#eef2ff;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-400:#9ca3af; --gray-500:#6b7280; --gray-700:#374151; --gray-900:#111827;
+    --red-500:#ef4444; --red-600:#dc2626; --red-50:#fef2f2;
+    --blue-500:#3b82f6; --green-500:#22c55e; --amber-500:#f59e0b;
+  }
+  html, body {
+    font-family: 'Pretendard','Inter',system-ui,sans-serif;
+    color: var(--gray-900); background: var(--gray-50);
+    -webkit-font-smoothing: antialiased; font-feature-settings: 'tnum' 1;
+  }
+  .num,.mono { font-variant-numeric: tabular-nums; }
+  .mono { font-family:'JetBrains Mono', ui-monospace, Menlo, monospace; }
+
+  .nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; font-size:13px; color:var(--gray-700); cursor:pointer; }
+  .nav-item:hover { background: var(--gray-100); }
+  .nav-item.active { background: var(--indigo-50); color: var(--indigo); font-weight:600; }
+  .nav-item .ico { width:16px; height:16px; }
+  .acc-dot { width:8px; height:8px; border-radius:2px; display:inline-block; margin-right:8px; }
+
+  .btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:8px; font-size:13px; font-weight:500; border:1px solid var(--gray-200); background:#fff; color:var(--gray-700); }
+  .btn:hover { background: var(--gray-50); }
+  .btn-primary { background:var(--indigo); color:#fff; border-color:var(--indigo); }
+  .btn-primary:hover { background:var(--indigo-700); border-color:var(--indigo-700); }
+  .btn-ghost { border:0; }
+
+  .field { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--gray-200); background:#fff; border-radius:8px; height:32px; padding:0 10px; font-size:13px; color:var(--gray-700); }
+  .field input, .field select { background:transparent; border:0; outline:0; font:inherit; color:inherit; }
+
+  .card { background:#fff; border:1px solid var(--gray-200); border-radius:12px; }
+  .card-h { padding:14px 18px; border-bottom:1px solid var(--gray-100); display:flex; align-items:center; gap:8px; }
+  .card-h h3 { font-size:14px; font-weight:600; color:var(--gray-900); }
+
+  .seg { display:inline-flex; background: var(--gray-100); padding:2px; border-radius:8px; font-size:12px; }
+  .seg button { padding:4px 10px; border-radius:6px; color:var(--gray-500); font-weight:500; }
+  .seg button.is-on { background:#fff; color:var(--gray-900); box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+
+  .scroll::-webkit-scrollbar { width:10px; height:10px; }
+  .scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:999px; border:2px solid var(--gray-50); }
+
+  /* 예산 테이블 */
+  .b-row { display:grid; grid-template-columns: 32px 1fr 140px 1fr 120px 100px 56px; gap:12px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--gray-100); }
+  .b-row.head { background:var(--gray-50); padding:10px 18px; border-bottom:1px solid var(--gray-200); }
+  .b-row.head > * { font-size:11px; font-weight:600; color:var(--gray-500); letter-spacing:0.04em; text-transform:uppercase; }
+  .b-row:hover:not(.head) { background:#fafbff; }
+
+  .b-bar { height:8px; border-radius:999px; background: var(--gray-100); overflow:hidden; position:relative; }
+  .b-bar > span { display:block; height:100%; border-radius:999px; transition: width 240ms; }
+  .b-bar .marker { position:absolute; top:-2px; bottom:-2px; width:1px; background: var(--gray-400); }
+  .b-bar .marker::after { content:''; position:absolute; top:-3px; left:-3px; width:7px; height:7px; border-radius:999px; background:#fff; border:1.5px solid var(--gray-400); }
+
+  .pill { display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border-radius:999px; font-size:11px; font-weight:500; }
+  .pill.ok    { background:#ecfdf5; color:#059669; }
+  .pill.warn  { background:#fef3c7; color:#b45309; }
+  .pill.over  { background:#fee2e2; color:#b91c1c; }
+  .pill.idle  { background:var(--gray-100); color:var(--gray-500); }
+
+  .input-amt { display:inline-flex; align-items:center; gap:4px; border:1px solid var(--gray-200); border-radius:8px; padding:0 10px; height:32px; background:#fff; }
+  .input-amt input { width:100%; border:0; outline:0; background:transparent; font:inherit; text-align:right; font-variant-numeric: tabular-nums; font-family:'JetBrains Mono', monospace; font-size:13px; }
+  .input-amt:focus-within { border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+
+  kbd { font-family:'JetBrains Mono', monospace; font-size:10.5px; background:var(--gray-100); border:1px solid var(--gray-200); border-bottom-width:2px; border-radius:4px; padding:1px 5px; color:var(--gray-700); }
+
+  /* 큰 진행 게이지 */
+  .gauge { height:14px; border-radius:999px; background: var(--gray-100); position:relative; overflow:hidden; }
+  .gauge .bar { height:100%; border-radius:999px; background: var(--indigo); }
+  .gauge .marker { position:absolute; top:-3px; bottom:-3px; width:2px; background: var(--gray-900); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  <aside class="w-[232px] shrink-0 bg-white border-r border-gray-200 flex flex-col">
+    <div class="px-5 h-14 flex items-center gap-2 border-b border-gray-200">
+      <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-white"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="font-bold text-[15px] tracking-tight">Monimo</div>
+      <span class="ml-auto text-[10px] text-gray-400 font-medium">v1</span>
+    </div>
+
+    <div class="p-3">
+      <button class="btn btn-primary w-full justify-center">
+        <svg viewBox="0 0 24 24" fill="none" class="w-3.5 h-3.5"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        새 거래 추가
+      </button>
+    </div>
+
+    <nav class="px-3 flex flex-col gap-0.5">
+      <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-2 mb-1.5">메인</div>
+      <a class="nav-item" href="Monimo Ledger.html">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        거래 내역
+        <span class="ml-auto text-[11px] text-gray-400 num">428</span>
+      </a>
+      <a class="nav-item" href="Monimo Dashboard.html">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M3 13l4-4 4 4 7-7M14 6h7v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        대시보드
+      </a>
+      <a class="nav-item active" href="Monimo Budget.html">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        예산
+      </a>
+      <a class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.6"/></svg>
+        계좌
+      </a>
+      <a class="nav-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        카테고리
+      </a>
+
+      <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-5 mb-1.5">계좌</div>
+      <a class="nav-item"><span class="acc-dot" style="background:#6366f1"></span> 카카오뱅크 체크 <span class="ml-auto mono text-[11px] text-gray-500">1,284,200</span></a>
+      <a class="nav-item"><span class="acc-dot" style="background:#f59e0b"></span> 신한 신용카드 <span class="ml-auto mono text-[11px] text-red-500">−842,500</span></a>
+      <a class="nav-item"><span class="acc-dot" style="background:#10b981"></span> 토스뱅크 적금 <span class="ml-auto mono text-[11px] text-gray-500">3,000,000</span></a>
+      <a class="nav-item"><span class="acc-dot" style="background:#6b7280"></span> 현금 지갑 <span class="ml-auto mono text-[11px] text-gray-500">42,000</span></a>
+    </nav>
+
+    <div class="mt-auto p-3 border-t border-gray-200">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[12px] font-semibold">JS</div>
+        <div class="min-w-0">
+          <div class="text-[12px] font-semibold truncate">정수민</div>
+          <div class="text-[11px] text-gray-500 truncate">soomin@example.com</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 min-w-0 flex flex-col">
+
+    <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <button class="btn btn-ghost px-1.5"><svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <div class="text-[15px] font-semibold">2026년 5월 예산</div>
+        <button class="btn btn-ghost px-1.5"><svg viewBox="0 0 24 24" fill="none" class="w-4 h-4"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="h-5 w-px bg-gray-200 mx-2"></div>
+      <div class="text-[13px] text-gray-500">월별 전체 예산 + 카테고리 예산 설정</div>
+      <div class="ml-auto flex items-center gap-1.5">
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" class="w-3.5 h-3.5"><path d="M4 4l16 16M20 4L4 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>지난 달 복사</button>
+        <button class="btn btn-primary">변경 사항 저장 <kbd class="!bg-indigo-700 !border-indigo-700 !text-white">⌘S</kbd></button>
+      </div>
+    </header>
+
+    <div class="flex-1 min-h-0 overflow-auto scroll p-6 space-y-5">
+
+      <!-- 월 전체 예산 카드 -->
+      <section class="card">
+        <div class="px-6 py-5 grid grid-cols-12 gap-6 items-center">
+          <div class="col-span-4">
+            <div class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">5월 전체 예산</div>
+            <div class="mt-2 flex items-baseline gap-1">
+              <div class="input-amt w-[200px] h-[44px]">
+                <input value="3,000,000" class="text-[22px] font-bold" />
+                <span class="text-gray-400 text-[13px]">원</span>
+              </div>
+            </div>
+            <div class="text-[12px] text-gray-500 mt-2 flex items-center gap-3">
+              <span>지난 달 <span class="mono text-gray-700">2,800,000</span></span>
+              <span class="text-gray-300">·</span>
+              <span class="text-green-500">+200,000</span>
+            </div>
+          </div>
+
+          <div class="col-span-8">
+            <div class="flex items-baseline justify-between mb-2">
+              <div class="text-[12.5px] text-gray-500">사용 진행률 · 23일 남음</div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-[20px] font-bold mono text-gray-900">2,184,300</span>
+                <span class="text-[12px] text-gray-400">/ 3,000,000원</span>
+                <span class="ml-2 text-[12px] font-semibold text-amber-500">72.8%</span>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="bar" style="width:72.8%"></div>
+              <!-- 이상 페이스 마커 (오늘 = 7/31일 = 22.6%) -->
+              <div class="marker" style="left:22.6%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-gray-400 mt-1.5">
+              <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-gray-900"></span>이상 페이스 22.6%</span>
+              <span class="text-amber-600">예상 월말 사용 <span class="mono">9,672,900원</span> · 페이스 초과</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 mini stat -->
+      <section class="grid grid-cols-4 gap-3">
+        <div class="card p-4">
+          <div class="text-[12px] text-gray-500">잔여 예산</div>
+          <div class="mt-1.5 text-[20px] font-bold mono">815,700<span class="text-[12px] text-gray-400 ml-0.5">원</span></div>
+          <div class="text-[11px] text-gray-400 mt-0.5">하루 35,465원 가능</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[12px] text-gray-500">초과 카테고리</div>
+          <div class="mt-1.5 text-[20px] font-bold text-red-500">2개</div>
+          <div class="text-[11px] text-gray-400 mt-0.5">주거·공과금, 쇼핑</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[12px] text-gray-500">주의 카테고리</div>
+          <div class="mt-1.5 text-[20px] font-bold text-amber-500">1개</div>
+          <div class="text-[11px] text-gray-400 mt-0.5">카페·간식</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[12px] text-gray-500">설정된 카테고리</div>
+          <div class="mt-1.5 text-[20px] font-bold mono">8 / 10</div>
+          <div class="text-[11px] text-gray-400 mt-0.5">미설정 2개 · 교통, 기타수입</div>
+        </div>
+      </section>
+
+      <!-- 카테고리 예산 테이블 -->
+      <section class="card">
+        <div class="card-h">
+          <h3>카테고리별 예산</h3>
+          <div class="ml-2 text-[11px] text-gray-400">합계 <span class="mono text-gray-700">2,850,000</span> / 3,000,000원</div>
+          <div class="ml-auto flex items-center gap-2">
+            <div class="seg">
+              <button class="is-on">지출 (10)</button>
+              <button>수입 (3)</button>
+            </div>
+            <button class="btn"><svg viewBox="0 0 24 24" fill="none" class="w-3.5 h-3.5"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>카테고리</button>
+          </div>
+        </div>
+
+        <div class="b-row head">
+          <div></div>
+          <div>카테고리</div>
+          <div class="text-right">예산</div>
+          <div>사용 / 예산</div>
+          <div class="text-right">남은 금액</div>
+          <div class="text-center">상태</div>
+          <div></div>
+        </div>
+
+        <!-- 식비 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">🍚</div>
+          <div>
+            <div class="text-[13.5px] font-medium">식비</div>
+            <div class="text-[11px] text-gray-400">26건 · 평균 23,523원/건</div>
+          </div>
+          <div class="input-amt"><input value="700,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:87.4%; background:#6366f1"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-gray-500 mt-1 mono">611,604 / 700,000 (87.4%)</div>
+          </div>
+          <div class="text-right mono text-[13px]">88,396</div>
+          <div class="text-center"><span class="pill warn">페이스 초과</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 주거·공과금 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">🏠</div>
+          <div>
+            <div class="text-[13.5px] font-medium">주거·공과금</div>
+            <div class="text-[11px] text-gray-400">3건 · 월세 + 관리비 + 공과금</div>
+          </div>
+          <div class="input-amt"><input value="1,000,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:100%; background:#ef4444"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-red-600 mt-1 mono">1,022,300 / 1,000,000 (102.2%)</div>
+          </div>
+          <div class="text-right mono text-[13px] text-red-600">−22,300</div>
+          <div class="text-center"><span class="pill over">예산 초과</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 쇼핑 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">🛍️</div>
+          <div>
+            <div class="text-[13.5px] font-medium">쇼핑</div>
+            <div class="text-[11px] text-gray-400">8건 · 무신사 · 쿠팡 · 다이소</div>
+          </div>
+          <div class="input-amt"><input value="300,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:100%; background:#ef4444"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-red-600 mt-1 mono">305,802 / 300,000 (102%)</div>
+          </div>
+          <div class="text-right mono text-[13px] text-red-600">−5,802</div>
+          <div class="text-center"><span class="pill over">예산 초과</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 의료 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">💊</div>
+          <div>
+            <div class="text-[13.5px] font-medium">의료·건강</div>
+            <div class="text-[11px] text-gray-400">2건 · 필라테스 + 영양제</div>
+          </div>
+          <div class="input-amt"><input value="300,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:87.4%; background:#6366f1"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-gray-500 mt-1 mono">262,116 / 300,000 (87%)</div>
+          </div>
+          <div class="text-right mono text-[13px]">37,884</div>
+          <div class="text-center"><span class="pill warn">페이스 초과</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 문화 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">🎬</div>
+          <div>
+            <div class="text-[13.5px] font-medium">문화·여가</div>
+            <div class="text-[11px] text-gray-400">5건 · 영화 · 한강 피크닉</div>
+          </div>
+          <div class="input-amt"><input value="250,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:87.4%; background:#6366f1"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-gray-500 mt-1 mono">218,430 / 250,000 (87%)</div>
+          </div>
+          <div class="text-right mono text-[13px]">31,570</div>
+          <div class="text-center"><span class="pill warn">페이스 초과</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 카페 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">☕</div>
+          <div>
+            <div class="text-[13.5px] font-medium">카페·간식</div>
+            <div class="text-[11px] text-gray-400">19건 · 평균 9,197원/건</div>
+          </div>
+          <div class="input-amt"><input value="150,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:100%; background:#f59e0b"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-amber-600 mt-1 mono">174,744 / 150,000 (116%)</div>
+          </div>
+          <div class="text-right mono text-[13px] text-amber-600">−24,744</div>
+          <div class="text-center"><span class="pill over">예산 초과</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 교육 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">📚</div>
+          <div>
+            <div class="text-[13.5px] font-medium">교육</div>
+            <div class="text-[11px] text-gray-400">1건 · 코드잇 구독</div>
+          </div>
+          <div class="input-amt"><input value="50,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:78%; background:#10b981"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-gray-500 mt-1 mono">39,000 / 50,000 (78%)</div>
+          </div>
+          <div class="text-right mono text-[13px]">11,000</div>
+          <div class="text-center"><span class="pill ok">정상</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 저축 -->
+        <div class="b-row">
+          <div class="text-[18px] text-center">💰</div>
+          <div>
+            <div class="text-[13.5px] font-medium">저축·투자</div>
+            <div class="text-[11px] text-gray-400">예산 외 항목 · 자동이체</div>
+          </div>
+          <div class="input-amt"><input value="500,000" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div>
+            <div class="b-bar"><span style="width:100%; background:#22c55e"></span><div class="marker" style="left:22.6%"></div></div>
+            <div class="text-[11px] text-green-600 mt-1 mono">500,000 / 500,000 (100%)</div>
+          </div>
+          <div class="text-right mono text-[13px]">0</div>
+          <div class="text-center"><span class="pill ok">목표 달성</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 교통 (미설정) -->
+        <div class="b-row">
+          <div class="text-[18px] text-center opacity-60">🚌</div>
+          <div>
+            <div class="text-[13.5px] font-medium text-gray-700">교통</div>
+            <div class="text-[11px] text-gray-400">12건 · 87,200원 사용 중</div>
+          </div>
+          <div class="input-amt" style="border-style:dashed"><input placeholder="미설정" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div class="text-[12px] text-gray-400">예산을 설정하면 추적이 시작됩니다</div>
+          <div class="text-right text-gray-400 text-[12px]">—</div>
+          <div class="text-center"><span class="pill idle">미설정</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+
+        <!-- 기타 (미설정) -->
+        <div class="b-row" style="border-bottom:0">
+          <div class="text-[18px] text-center opacity-60">➕</div>
+          <div>
+            <div class="text-[13.5px] font-medium text-gray-700">기타</div>
+            <div class="text-[11px] text-gray-400">3건 · 24,300원 사용 중</div>
+          </div>
+          <div class="input-amt" style="border-style:dashed"><input placeholder="미설정" /><span class="text-gray-400 text-[12px]">원</span></div>
+          <div class="text-[12px] text-gray-400">예산을 설정하면 추적이 시작됩니다</div>
+          <div class="text-right text-gray-400 text-[12px]">—</div>
+          <div class="text-center"><span class="pill idle">미설정</span></div>
+          <div class="text-right"><button class="text-gray-400 hover:text-gray-700 px-1">⋯</button></div>
+        </div>
+      </section>
+
+      <!-- 도움말 -->
+      <section class="grid grid-cols-2 gap-3">
+        <div class="card p-5">
+          <div class="flex items-center gap-2 text-gray-700 text-[13px] font-semibold">
+            <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-indigo-600"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            페이스 마커란?
+          </div>
+          <div class="text-[12.5px] text-gray-500 mt-2 leading-relaxed">
+            진행 막대 위 회색 점은 오늘까지의 <span class="text-gray-700 font-medium">이상 사용 페이스</span>를 나타냅니다.
+            5월 7일 기준 22.6% — 이 지점을 넘으면 월말 초과가 예상되어 <span class="text-amber-600 font-medium">페이스 초과</span> 표시가 붙습니다.
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center gap-2 text-gray-700 text-[13px] font-semibold">
+            <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-indigo-600"><path d="M4 4v16h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 14l3-3 3 3 5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            예산이 처음이라면
+          </div>
+          <div class="text-[12.5px] text-gray-500 mt-2 leading-relaxed">
+            지난 1–3개월 평균을 그대로 가져오는 게 시작점으로 가장 좋습니다.
+            우측 상단 <span class="text-gray-700 font-medium">"지난 달 복사"</span> 버튼으로 4월 예산을 그대로 5월에 적용할 수 있습니다.
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

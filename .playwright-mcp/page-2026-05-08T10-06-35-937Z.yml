@@ -1,0 +1,250 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e6]
+      - generic [ref=e8]: Monimo
+      - generic [ref=e9]: v1
+    - button "새 거래 추가" [ref=e11] [cursor=pointer]:
+      - img [ref=e12]
+      - text: 새 거래 추가
+    - navigation [ref=e14]:
+      - generic [ref=e15]: 메인
+      - link "거래 내역 428" [ref=e16] [cursor=pointer]:
+        - /url: Monimo Ledger.html
+        - img [ref=e17]
+        - text: 거래 내역
+        - generic [ref=e19]: "428"
+      - link "대시보드" [ref=e20] [cursor=pointer]:
+        - /url: Monimo Dashboard.html
+        - img [ref=e21]
+        - text: 대시보드
+      - link "예산" [ref=e23] [cursor=pointer]:
+        - /url: Monimo Budget.html
+        - img [ref=e24]
+        - text: 예산
+      - generic [ref=e27] [cursor=pointer]:
+        - img [ref=e28]
+        - text: 계좌
+      - generic [ref=e30] [cursor=pointer]:
+        - img [ref=e31]
+        - text: 카테고리
+      - generic [ref=e33]: 계좌
+      - generic [ref=e34] [cursor=pointer]:
+        - text: 카카오뱅크 체크
+        - generic [ref=e36]: 1,284,200
+      - generic [ref=e37] [cursor=pointer]:
+        - text: 신한 신용카드
+        - generic [ref=e39]: −842,500
+      - generic [ref=e40] [cursor=pointer]:
+        - text: 토스뱅크 적금
+        - generic [ref=e42]: 3,000,000
+      - generic [ref=e43] [cursor=pointer]:
+        - text: 현금 지갑
+        - generic [ref=e45]: 42,000
+    - generic [ref=e47]:
+      - generic [ref=e48]: JS
+      - generic [ref=e49]:
+        - generic [ref=e50]: 정수민
+        - generic [ref=e51]: soomin@example.com
+  - main [ref=e52]:
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - button [ref=e55] [cursor=pointer]:
+          - img [ref=e56]
+        - generic [ref=e58]: 2026년 5월 예산
+        - button [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+      - generic [ref=e63]: 월별 전체 예산 + 카테고리 예산 설정
+      - generic [ref=e64]:
+        - button "지난 달 복사" [ref=e65] [cursor=pointer]:
+          - img [ref=e66]
+          - text: 지난 달 복사
+        - button "변경 사항 저장 ⌘S" [ref=e68] [cursor=pointer]:
+          - text: 변경 사항 저장
+          - generic [ref=e69]: ⌘S
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - generic [ref=e74]: 5월 전체 예산
+          - generic [ref=e76]:
+            - textbox [ref=e77]: 3,000,000
+            - generic [ref=e78]: 원
+          - generic [ref=e79]:
+            - generic [ref=e80]: 지난 달 2,800,000
+            - generic [ref=e81]: ·
+            - generic [ref=e82]: +200,000
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]: 사용 진행률 · 23일 남음
+            - generic [ref=e86]:
+              - generic [ref=e87]: 2,184,300
+              - generic [ref=e88]: / 3,000,000원
+              - generic [ref=e89]: 72.8%
+          - generic [ref=e93]:
+            - generic [ref=e94]: 이상 페이스 22.6%
+            - generic [ref=e96]: 예상 월말 사용 9,672,900원 · 페이스 초과
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - generic [ref=e99]: 잔여 예산
+          - generic [ref=e100]: 815,700원
+          - generic [ref=e101]: 하루 35,465원 가능
+        - generic [ref=e102]:
+          - generic [ref=e103]: 초과 카테고리
+          - generic [ref=e104]: 2개
+          - generic [ref=e105]: 주거·공과금, 쇼핑
+        - generic [ref=e106]:
+          - generic [ref=e107]: 주의 카테고리
+          - generic [ref=e108]: 1개
+          - generic [ref=e109]: 카페·간식
+        - generic [ref=e110]:
+          - generic [ref=e111]: 설정된 카테고리
+          - generic [ref=e112]: 8 / 10
+          - generic [ref=e113]: 미설정 2개 · 교통, 기타수입
+      - generic [ref=e114]:
+        - generic [ref=e115]:
+          - heading "카테고리별 예산" [level=3] [ref=e116]
+          - generic [ref=e117]: 합계 2,850,000 / 3,000,000원
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - button "지출 (10)" [ref=e120] [cursor=pointer]
+              - button "수입 (3)" [ref=e121] [cursor=pointer]
+            - button "카테고리" [ref=e122] [cursor=pointer]:
+              - img [ref=e123]
+              - text: 카테고리
+        - generic [ref=e125]:
+          - generic [ref=e126]: 카테고리
+          - generic [ref=e127]: 예산
+          - generic [ref=e128]: 사용 / 예산
+          - generic [ref=e129]: 남은 금액
+          - generic [ref=e130]: 상태
+        - generic [ref=e131]:
+          - generic [ref=e132]: 🍚
+          - generic [ref=e133]:
+            - generic [ref=e134]: 식비
+            - generic [ref=e135]: 26건 · 평균 23,523원/건
+          - generic [ref=e136]:
+            - textbox [ref=e137]: 700,000
+            - generic [ref=e138]: 원
+          - generic [ref=e143]: 611,604 / 700,000 (87.4%)
+          - generic [ref=e144]: 88,396
+          - generic [ref=e146]: 페이스 초과
+          - button "⋯" [ref=e148] [cursor=pointer]
+        - generic [ref=e149]:
+          - generic [ref=e150]: 🏠
+          - generic [ref=e151]:
+            - generic [ref=e152]: 주거·공과금
+            - generic [ref=e153]: 3건 · 월세 + 관리비 + 공과금
+          - generic [ref=e154]:
+            - textbox [ref=e155]: 1,000,000
+            - generic [ref=e156]: 원
+          - generic [ref=e161]: 1,022,300 / 1,000,000 (102.2%)
+          - generic [ref=e162]: −22,300
+          - generic [ref=e164]: 예산 초과
+          - button "⋯" [ref=e166] [cursor=pointer]
+        - generic [ref=e167]:
+          - generic [ref=e168]: 🛍️
+          - generic [ref=e169]:
+            - generic [ref=e170]: 쇼핑
+            - generic [ref=e171]: 8건 · 무신사 · 쿠팡 · 다이소
+          - generic [ref=e172]:
+            - textbox [ref=e173]: 300,000
+            - generic [ref=e174]: 원
+          - generic [ref=e179]: 305,802 / 300,000 (102%)
+          - generic [ref=e180]: −5,802
+          - generic [ref=e182]: 예산 초과
+          - button "⋯" [ref=e184] [cursor=pointer]
+        - generic [ref=e185]:
+          - generic [ref=e186]: 💊
+          - generic [ref=e187]:
+            - generic [ref=e188]: 의료·건강
+            - generic [ref=e189]: 2건 · 필라테스 + 영양제
+          - generic [ref=e190]:
+            - textbox [ref=e191]: 300,000
+            - generic [ref=e192]: 원
+          - generic [ref=e197]: 262,116 / 300,000 (87%)
+          - generic [ref=e198]: 37,884
+          - generic [ref=e200]: 페이스 초과
+          - button "⋯" [ref=e202] [cursor=pointer]
+        - generic [ref=e203]:
+          - generic [ref=e204]: 🎬
+          - generic [ref=e205]:
+            - generic [ref=e206]: 문화·여가
+            - generic [ref=e207]: 5건 · 영화 · 한강 피크닉
+          - generic [ref=e208]:
+            - textbox [ref=e209]: 250,000
+            - generic [ref=e210]: 원
+          - generic [ref=e215]: 218,430 / 250,000 (87%)
+          - generic [ref=e216]: 31,570
+          - generic [ref=e218]: 페이스 초과
+          - button "⋯" [ref=e220] [cursor=pointer]
+        - generic [ref=e221]:
+          - generic [ref=e222]: ☕
+          - generic [ref=e223]:
+            - generic [ref=e224]: 카페·간식
+            - generic [ref=e225]: 19건 · 평균 9,197원/건
+          - generic [ref=e226]:
+            - textbox [ref=e227]: 150,000
+            - generic [ref=e228]: 원
+          - generic [ref=e233]: 174,744 / 150,000 (116%)
+          - generic [ref=e234]: −24,744
+          - generic [ref=e236]: 예산 초과
+          - button "⋯" [ref=e238] [cursor=pointer]
+        - generic [ref=e239]:
+          - generic [ref=e240]: 📚
+          - generic [ref=e241]:
+            - generic [ref=e242]: 교육
+            - generic [ref=e243]: 1건 · 코드잇 구독
+          - generic [ref=e244]:
+            - textbox [ref=e245]: 50,000
+            - generic [ref=e246]: 원
+          - generic [ref=e251]: 39,000 / 50,000 (78%)
+          - generic [ref=e252]: 11,000
+          - generic [ref=e254]: 정상
+          - button "⋯" [ref=e256] [cursor=pointer]
+        - generic [ref=e257]:
+          - generic [ref=e258]: 💰
+          - generic [ref=e259]:
+            - generic [ref=e260]: 저축·투자
+            - generic [ref=e261]: 예산 외 항목 · 자동이체
+          - generic [ref=e262]:
+            - textbox [ref=e263]: 500,000
+            - generic [ref=e264]: 원
+          - generic [ref=e269]: 500,000 / 500,000 (100%)
+          - generic [ref=e270]: "0"
+          - generic [ref=e272]: 목표 달성
+          - button "⋯" [ref=e274] [cursor=pointer]
+        - generic [ref=e275]:
+          - generic [ref=e276]: 🚌
+          - generic [ref=e277]:
+            - generic [ref=e278]: 교통
+            - generic [ref=e279]: 12건 · 87,200원 사용 중
+          - generic [ref=e280]:
+            - textbox "미설정" [ref=e281]
+            - generic [ref=e282]: 원
+          - generic [ref=e283]: 예산을 설정하면 추적이 시작됩니다
+          - generic [ref=e284]: —
+          - generic [ref=e286]: 미설정
+          - button "⋯" [ref=e288] [cursor=pointer]
+        - generic [ref=e289]:
+          - generic [ref=e290]: ➕
+          - generic [ref=e291]:
+            - generic [ref=e292]: 기타
+            - generic [ref=e293]: 3건 · 24,300원 사용 중
+          - generic [ref=e294]:
+            - textbox "미설정" [ref=e295]
+            - generic [ref=e296]: 원
+          - generic [ref=e297]: 예산을 설정하면 추적이 시작됩니다
+          - generic [ref=e298]: —
+          - generic [ref=e300]: 미설정
+          - button "⋯" [ref=e302] [cursor=pointer]
+      - generic [ref=e303]:
+        - generic [ref=e304]:
+          - generic [ref=e305]:
+            - img [ref=e306]
+            - text: 페이스 마커란?
+          - generic [ref=e309]: 진행 막대 위 회색 점은 오늘까지의 이상 사용 페이스를 나타냅니다. 5월 7일 기준 22.6% — 이 지점을 넘으면 월말 초과가 예상되어 페이스 초과 표시가 붙습니다.
+        - generic [ref=e310]:
+          - generic [ref=e311]:
+            - img [ref=e312]
+            - text: 예산이 처음이라면
+          - generic [ref=e315]: 지난 1–3개월 평균을 그대로 가져오는 게 시작점으로 가장 좋습니다. 우측 상단 "지난 달 복사" 버튼으로 4월 예산을 그대로 5월에 적용할 수 있습니다.

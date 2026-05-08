@@ -1,0 +1,293 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e6]
+      - generic [ref=e8]: Monimo
+      - generic [ref=e9]: v1
+    - button "새 거래 추가" [ref=e11] [cursor=pointer]:
+      - img [ref=e12]
+      - text: 새 거래 추가
+    - navigation [ref=e14]:
+      - generic [ref=e15]: 메인
+      - link "거래 내역 428" [ref=e16] [cursor=pointer]:
+        - /url: Monimo Ledger.html
+        - img [ref=e17]
+        - text: 거래 내역
+        - generic [ref=e19]: "428"
+      - link "대시보드" [ref=e20] [cursor=pointer]:
+        - /url: Monimo Dashboard.html
+        - img [ref=e21]
+        - text: 대시보드
+      - link "예산" [ref=e23] [cursor=pointer]:
+        - /url: Monimo Budget.html
+        - img [ref=e24]
+        - text: 예산
+      - generic [ref=e27] [cursor=pointer]:
+        - img [ref=e28]
+        - text: 계좌
+      - generic [ref=e30] [cursor=pointer]:
+        - img [ref=e31]
+        - text: 카테고리
+      - generic [ref=e33]: 계좌
+      - generic [ref=e34] [cursor=pointer]:
+        - text: 카카오뱅크 체크
+        - generic [ref=e36]: 1,284,200
+      - generic [ref=e37] [cursor=pointer]:
+        - text: 신한 신용카드
+        - generic [ref=e39]: −842,500
+      - generic [ref=e40] [cursor=pointer]:
+        - text: 토스뱅크 적금
+        - generic [ref=e42]: 3,000,000
+      - generic [ref=e43] [cursor=pointer]:
+        - text: 현금 지갑
+        - generic [ref=e45]: 42,000
+    - generic [ref=e47]:
+      - generic [ref=e48]: JS
+      - generic [ref=e49]:
+        - generic [ref=e50]: 정수민
+        - generic [ref=e51]: soomin@example.com
+  - main [ref=e52]:
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - button [ref=e55] [cursor=pointer]:
+          - img [ref=e56]
+        - generic [ref=e58]: 2026년 5월
+        - button [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+        - button "오늘" [ref=e62] [cursor=pointer]
+      - generic [ref=e64]: 5월 1일 — 5월 7일까지의 활동 요약
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - button "월간" [ref=e67] [cursor=pointer]
+          - button "주간" [ref=e68] [cursor=pointer]
+          - button "연간" [ref=e69] [cursor=pointer]
+        - button "리포트" [ref=e70] [cursor=pointer]:
+          - img [ref=e71]
+          - text: 리포트
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e77]: 이번 달 수입
+            - generic [ref=e78]: +12.4%
+          - generic [ref=e79]:
+            - generic [ref=e80]: 4,820,000
+            - generic [ref=e81]: 원
+          - generic [ref=e82]: 3건 · 월급, 부수입
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]: 이번 달 지출
+            - generic [ref=e86]: +5.1%
+          - generic [ref=e87]:
+            - generic [ref=e88]: 2,184,300
+            - generic [ref=e89]: 원
+          - generic [ref=e90]: 87건 · 일평균 311,400원
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - generic [ref=e93]: 잔여 예산
+            - generic [ref=e94]: 예산 3,000,000
+          - generic [ref=e95]:
+            - generic [ref=e96]: 815,700
+            - generic [ref=e97]: 원
+          - generic [ref=e100]: 72.8% 사용 · 23일 남음
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]: 순자산
+            - generic [ref=e104]: +2,635,700
+          - generic [ref=e105]:
+            - generic [ref=e106]: 3,483,700
+            - generic [ref=e107]: 원
+          - generic [ref=e108]: 계좌 4개 · 이체 12건 제외
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - heading "최근 6개월 수입 · 지출" [level=3] [ref=e112]
+            - generic [ref=e113]:
+              - generic [ref=e114]: 수입
+              - generic [ref=e116]: 지출
+              - generic [ref=e118]: 저축
+          - img [ref=e121]:
+            - generic [ref=e123]:
+              - generic [ref=e124]: 600만
+              - generic [ref=e125]: 400만
+              - generic [ref=e126]: 200만
+              - generic [ref=e127]: "0"
+            - generic [ref=e128]:
+              - generic [ref=e129]: 12월
+              - generic [ref=e130]: 1월
+              - generic [ref=e131]: 2월
+              - generic [ref=e132]: 3월
+              - generic [ref=e133]: 4월
+              - generic [ref=e134]: 5월
+            - generic [ref=e160]: +2,635,700
+        - generic [ref=e161]:
+          - heading "카테고리별 지출" [level=3] [ref=e163]
+          - generic [ref=e164]:
+            - generic [ref=e168]:
+              - generic [ref=e169]: 총 지출
+              - generic [ref=e170]: 2,184,300
+              - generic [ref=e171]: 원 · 87건
+            - list [ref=e172]:
+              - listitem [ref=e173]:
+                - generic [ref=e175]: 식비
+                - generic [ref=e176]: 611,604
+                - generic [ref=e177]: 28%
+              - listitem [ref=e178]:
+                - generic [ref=e180]: 주거·공과금
+                - generic [ref=e181]: 393,174
+                - generic [ref=e182]: 18%
+              - listitem [ref=e183]:
+                - generic [ref=e185]: 쇼핑
+                - generic [ref=e186]: 305,802
+                - generic [ref=e187]: 14%
+              - listitem [ref=e188]:
+                - generic [ref=e190]: 의료·건강
+                - generic [ref=e191]: 262,116
+                - generic [ref=e192]: 12%
+              - listitem [ref=e193]:
+                - generic [ref=e195]: 문화·여가
+                - generic [ref=e196]: 218,430
+                - generic [ref=e197]: 10%
+              - listitem [ref=e198]:
+                - generic [ref=e200]: 카페·간식
+                - generic [ref=e201]: 174,744
+                - generic [ref=e202]: 8%
+              - listitem [ref=e203]:
+                - generic [ref=e205]: 기타 (3개)
+                - generic [ref=e206]: 218,430
+                - generic [ref=e207]: 10%
+      - generic [ref=e208]:
+        - generic [ref=e209]:
+          - generic [ref=e210]:
+            - heading "카테고리 예산 사용률" [level=3] [ref=e211]
+            - link "예산 편집 →" [ref=e212] [cursor=pointer]:
+              - /url: Monimo Budget.html
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - generic [ref=e216]: 🍚
+              - generic [ref=e218]:
+                - generic [ref=e219]: 식비
+                - generic [ref=e220]: 611,604 / 700,000
+              - generic [ref=e223]: 87%
+              - generic [ref=e224]: 정상
+            - generic [ref=e225]:
+              - generic [ref=e226]: 🏠
+              - generic [ref=e228]:
+                - generic [ref=e229]: 주거·공과금
+                - generic [ref=e230]: 1,022,300 / 1,000,000
+              - generic [ref=e233]: 102%
+              - generic [ref=e234]: 초과
+            - generic [ref=e235]:
+              - generic [ref=e236]: 🛍️
+              - generic [ref=e238]:
+                - generic [ref=e239]: 쇼핑
+                - generic [ref=e240]: 305,802 / 300,000
+              - generic [ref=e243]: 102%
+              - generic [ref=e244]: 초과
+            - generic [ref=e245]:
+              - generic [ref=e246]: 🚌
+              - generic [ref=e248]:
+                - generic [ref=e249]: 교통
+                - generic [ref=e250]: 87,200 / 150,000
+              - generic [ref=e253]: 58%
+              - generic [ref=e254]: 여유
+            - generic [ref=e255]:
+              - generic [ref=e256]: 🎬
+              - generic [ref=e258]:
+                - generic [ref=e259]: 문화·여가
+                - generic [ref=e260]: 218,430 / 250,000
+              - generic [ref=e263]: 87%
+              - generic [ref=e264]: 정상
+            - generic [ref=e265]:
+              - generic [ref=e266]: ☕
+              - generic [ref=e268]:
+                - generic [ref=e269]: 카페·간식
+                - generic [ref=e270]: 174,744 / 150,000
+              - generic [ref=e273]: 116%
+              - generic [ref=e274]: 주의
+            - generic [ref=e275]:
+              - generic [ref=e276]: 💊
+              - generic [ref=e278]:
+                - generic [ref=e279]: 의료·건강
+                - generic [ref=e280]: 262,116 / 300,000
+              - generic [ref=e283]: 87%
+              - generic [ref=e284]: 정상
+        - generic [ref=e285]:
+          - heading "일별 지출 강도" [level=3] [ref=e287]
+          - generic [ref=e288]:
+            - generic [ref=e289]:
+              - generic [ref=e291]: "1"
+              - generic [ref=e298]: "7"
+            - generic [ref=e323]:
+              - generic [ref=e324]: 적음
+              - generic [ref=e331]: 많음
+            - generic [ref=e332]:
+              - generic [ref=e333]:
+                - generic [ref=e334]: 최대 지출일
+                - generic [ref=e335]: 5월 1일 · 1,032,800
+              - generic [ref=e336]:
+                - generic [ref=e337]: 무지출일
+                - generic [ref=e338]: 2일 · 4일
+              - generic [ref=e339]:
+                - generic [ref=e340]: 일평균
+                - generic [ref=e341]: 311,471원
+      - generic [ref=e342]:
+        - generic [ref=e343]:
+          - generic [ref=e344]:
+            - heading "최근 거래" [level=3] [ref=e345]
+            - link "전체 보기 →" [ref=e346] [cursor=pointer]:
+              - /url: Monimo Ledger.html
+          - generic [ref=e348]:
+            - generic [ref=e349]:
+              - generic [ref=e350]: 🍚
+              - generic [ref=e351]:
+                - generic [ref=e352]: 점심 — 본가 김치찌개
+                - generic [ref=e353]: 식비 · 신한 신용카드 · 오늘 12:34
+              - generic [ref=e354]: −9,500
+            - generic [ref=e355]:
+              - generic [ref=e356]: ☕
+              - generic [ref=e357]:
+                - generic [ref=e358]: 스타벅스 — 아이스 아메리카노 T
+                - generic [ref=e359]: 카페·간식 · 신한 신용카드 · 오늘 09:12
+              - generic [ref=e360]: −4,800
+            - generic [ref=e361]:
+              - generic [ref=e362]: 🚌
+              - generic [ref=e363]:
+                - generic [ref=e364]: 지하철 2호선
+                - generic [ref=e365]: 교통 · 카카오뱅크 체크 · 오늘 08:24
+              - generic [ref=e366]: −1,500
+            - generic [ref=e367]:
+              - generic [ref=e368]: 🛍️
+              - generic [ref=e369]:
+                - generic [ref=e370]: 무신사 — 린넨 셔츠
+                - generic [ref=e371]: 쇼핑 · 신한 신용카드 · 오늘 00:48
+              - generic [ref=e372]: −27,000
+            - generic [ref=e373]:
+              - generic [ref=e374]: 💵
+              - generic [ref=e375]:
+                - generic [ref=e376]: 4월 급여 — (주)오렌지컴퍼니
+                - generic [ref=e377]: 월급 · 카카오뱅크 체크 · 5월 1일
+              - generic [ref=e378]: +4,520,000
+        - generic [ref=e379]:
+          - heading "이번 달 인사이트" [level=3] [ref=e381]
+          - generic [ref=e382]:
+            - generic [ref=e383]:
+              - generic [ref=e384]:
+                - img [ref=e385]
+                - text: 예산 초과 항목 2개
+              - generic [ref=e387]: 주거·공과금(+22,300원), 쇼핑(+5,802원)이 예산을 초과했습니다.
+            - generic [ref=e388]:
+              - generic [ref=e389]:
+                - img [ref=e390]
+                - text: 카페·간식 페이스 주의
+              - generic [ref=e393]: 7일 만에 예산의 116%를 사용했습니다. 이 페이스라면 월말에 약 773,000원이 예상됩니다.
+            - generic [ref=e394]:
+              - generic [ref=e395]:
+                - img [ref=e396]
+                - text: 저축률 사상 최고
+              - generic [ref=e398]: 이번 달 저축률은 54.7%로 최근 6개월 중 가장 높습니다.
+            - generic [ref=e399]:
+              - generic [ref=e400]:
+                - img [ref=e401]
+                - text: 일평균 지출
+              - generic [ref=e403]: 4월 일평균 328,400원 → 5월 311,471원. 5.1% 감소.
