@@ -1,0 +1,6 @@
+[      38ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-OY5C42Z6.js?v=5e78e634:21608
+[  161461ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://huqnsvfhiafsypvagpaf.supabase.co/auth/v1/token?grant_type=password:0
+[  168799ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://huqnsvfhiafsypvagpaf.supabase.co/auth/v1/token?grant_type=password:0
+[  170414ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://huqnsvfhiafsypvagpaf.supabase.co/auth/v1/token?grant_type=password:0
+[  208738ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://huqnsvfhiafsypvagpaf.supabase.co/auth/v1/token?grant_type=password:0
+[  224529ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://huqnsvfhiafsypvagpaf.supabase.co/auth/v1/token?grant_type=password:0

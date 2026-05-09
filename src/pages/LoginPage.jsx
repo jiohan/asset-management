@@ -1,10 +1,39 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import AuthLayout from '../components/layout/AuthLayout'
+import { useLogin } from '../hooks/useLogin'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { login, loading, error: serverError } = useLogin()
+
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [fieldErrors, setFieldErrors] = useState({})
   const [showPw, setShowPw] = useState(false)
+
+  function set(field) {
+    return e => setForm(prev => ({ ...prev, [field]: e.target.value }))
+  }
+
+  function validate() {
+    const errs = {}
+    if (!form.email) errs.email = '이메일을 입력해주세요.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = '올바른 이메일 형식이 아닙니다.'
+    if (!form.password) errs.password = '비밀번호를 입력해주세요.'
+    return errs
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    const errs = validate()
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs)
+      return
+    }
+    setFieldErrors({})
+    const ok = await login({ email: form.email, password: form.password })
+    if (ok) navigate('/dashboard')
+  }
 
   return (
     <AuthLayout onBack={() => navigate('/')}>
@@ -21,28 +50,32 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-        <Field label="이메일">
+        <Field label="이메일" error={fieldErrors.email}>
           <input
             type="email"
             placeholder="example@email.com"
             autoComplete="email"
-            style={inputStyle}
-            onFocus={e => Object.assign(e.target.style, inputFocusStyle)}
-            onBlur={e => Object.assign(e.target.style, inputStyle)}
+            value={form.email}
+            onChange={set('email')}
+            style={fieldErrors.email ? { ...inputStyle, ...inputErrorStyle } : inputStyle}
+            onFocus={e => Object.assign(e.target.style, fieldErrors.email ? { ...inputFocusStyle, ...inputErrorStyle } : inputFocusStyle)}
+            onBlur={e => Object.assign(e.target.style, fieldErrors.email ? { ...inputStyle, ...inputErrorStyle } : inputStyle)}
           />
         </Field>
 
-        <Field label="비밀번호">
+        <Field label="비밀번호" error={fieldErrors.password}>
           <div style={{ position: 'relative' }}>
             <input
               type={showPw ? 'text' : 'password'}
               placeholder="비밀번호 입력"
               autoComplete="current-password"
-              style={{ ...inputStyle, paddingRight: 44 }}
-              onFocus={e => Object.assign(e.target.style, { ...inputFocusStyle, paddingRight: 44 })}
-              onBlur={e => Object.assign(e.target.style, { ...inputStyle, paddingRight: 44 })}
+              value={form.password}
+              onChange={set('password')}
+              style={fieldErrors.password ? { ...inputStyle, ...inputErrorStyle, paddingRight: 44 } : { ...inputStyle, paddingRight: 44 }}
+              onFocus={e => Object.assign(e.target.style, fieldErrors.password ? { ...inputFocusStyle, ...inputErrorStyle, paddingRight: 44 } : { ...inputFocusStyle, paddingRight: 44 })}
+              onBlur={e => Object.assign(e.target.style, fieldErrors.password ? { ...inputStyle, ...inputErrorStyle, paddingRight: 44 } : { ...inputStyle, paddingRight: 44 })}
             />
             <button
               type="button"
@@ -55,13 +88,24 @@ export default function LoginPage() {
           </div>
         </Field>
 
+        {serverError && (
+          <div style={{
+            padding: '10px 14px', borderRadius: 8,
+            background: '#fef2f2', border: '1px solid #fecaca',
+            color: '#dc2626', fontSize: 13,
+          }}>
+            {serverError}
+          </div>
+        )}
+
         <button
           type="submit"
-          style={submitBtnStyle}
-          onMouseEnter={e => e.currentTarget.style.background = '#4338ca'}
-          onMouseLeave={e => e.currentTarget.style.background = '#4f46e5'}
+          disabled={loading}
+          style={{ ...submitBtnStyle, opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+          onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#4338ca' }}
+          onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#4f46e5' }}
         >
-          로그인
+          {loading ? '로그인 중...' : '로그인'}
         </button>
 
       </form>
@@ -76,13 +120,16 @@ export default function LoginPage() {
   )
 }
 
-function Field({ label, children }) {
+function Field({ label, error, children }) {
   return (
     <div>
       <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
         {label}
       </label>
       {children}
+      {error && (
+        <p style={{ margin: '4px 0 0', fontSize: 12, color: '#dc2626' }}>{error}</p>
+      )}
     </div>
   )
 }
@@ -125,6 +172,11 @@ const inputFocusStyle = {
   ...inputStyle,
   borderColor: '#4f46e5',
   boxShadow: '0 0 0 3px rgba(79,70,229,0.12)',
+}
+
+const inputErrorStyle = {
+  borderColor: '#ef4444',
+  boxShadow: '0 0 0 3px rgba(239,68,68,0.1)',
 }
 
 const eyeBtnStyle = {

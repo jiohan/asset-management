@@ -1,0 +1,25 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - button "돌아가기" [ref=e6] [cursor=pointer]:
+      - img [ref=e7]
+      - text: 돌아가기
+    - generic [ref=e9]:
+      - generic [ref=e10]: M
+      - generic [ref=e11]: Monimo
+      - generic [ref=e12]:
+        - text: 엑셀 없이, 수식 없이
+        - text: 하루 5분으로 쓰는
+        - text: 개인 웹 가계부
+    - generic [ref=e13]:
+      - generic [ref=e16]: 수입·지출 한눈에
+      - generic [ref=e19]: 카테고리 예산 관리
+      - generic [ref=e22]: 월간 리포트 자동생성
+  - generic [ref=e24]:
+    - img [ref=e55]
+    - heading "이메일을 확인해주세요" [level=2] [ref=e58]
+    - paragraph [ref=e59]: jiohan0906@gmail.com으로
+    - paragraph [ref=e60]:
+      - text: 인증 링크를 발송했습니다.
+      - text: 메일함에서 링크를 클릭하면 가입이 완료됩니다.
+    - generic [ref=e61]: 스팸 폴더도 확인해보세요
+    - button "로그인 화면으로 이동" [ref=e62] [cursor=pointer]
