@@ -1,0 +1,16 @@
+// src/pages/DashboardPage.jsx
+export default function DashboardPage() {
+  return (
+    <div className="flex-1 flex items-center justify-center p-6">
+      <div className="text-center">
+        <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mx-auto mb-3">
+          <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-indigo-600">
+            <path d="M3 13l4-4 4 4 7-7M14 6h7v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <p className="text-[15px] font-semibold text-gray-700">대시보드</p>
+        <p className="text-[13px] text-gray-400 mt-1">Phase 8에서 구현됩니다</p>
+      </div>
+    </div>
+  )
+}
