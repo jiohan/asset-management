@@ -19,6 +19,52 @@ Sidebar, Header, PageLayout 컴포넌트 + React Router 라우팅 설정.
 ## Phase 5 — 거래 입력/목록 (핵심)
 거래 추가 폼(지출·수입), 거래 목록, 수정·삭제. 이체 입력 포함.
 → 거래를 입력하고 목록에서 확인·삭제되면 완료.
+5-1 훅 작성
+    → 5-2 거래 추가 폼
+      → 5-3 거래 목록 테이블
+        → 5-4 월 네비 + 요약 카드
+          → 5-5 필터
+            → 5-6 수정/삭제
+              → 5-7 이체
+              Phase 5 — 브랜치 & 커밋 계획
+  
+  브랜치 전략
+
+  Phase 5 전체를 브랜치 1개로 작업해요. 기존 Phase 4(feature/layout)와 같은 방식이에요.
+
+  main
+   └── feature/phase5-ledger   ← 이 브랜치에서 모든 작업
+
+  ---
+  커밋 순서 (서브태스크당 1커밋)
+
+  순서: 1
+  커밋 메시지: feat: add transaction and category hooks
+  작업 내용: useCategories, useTransactions, useCreateTransaction, useUpdateTransaction, useDeleteTransaction 5개 훅
+  ────────────────────────────────────────
+  순서: 2
+  커밋 메시지: feat: add transaction create form modal
+  작업 내용: 거래 추가 폼 — 금액, 지출/수입 토글, 카테고리, 날짜, 계좌, 메모
+  ────────────────────────────────────────
+  순서: 3
+  커밋 메시지: feat: add ledger transaction list table
+  작업 내용: 날짜 그룹별 테이블, 금액 색상
+  ────────────────────────────────────────
+  순서: 4
+  커밋 메시지: feat: add month navigation and summary cards
+  작업 내용: < 2026년 5월 > 헤더, 요약 카드 4개
+  ────────────────────────────────────────
+  순서: 5
+  커밋 메시지: feat: add transaction filter toolbar
+  작업 내용: 전체/지출/수입/이체 탭, 계좌·카테고리 드롭다운
+  ────────────────────────────────────────
+  순서: 6
+  커밋 메시지: feat: add transaction detail panel
+  작업 내용: 행 클릭 → 우측 패널, 수정·삭제
+  ────────────────────────────────────────
+  순서: 7
+  커밋 메시지: feat: add transfer input
+  작업 내용: 이체 폼, 목록에 이체 행 표시
 
 ## Phase 6 — 계좌 관리
 계좌 추가·편집·삭제, 계좌별 잔액 표시.
