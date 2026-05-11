@@ -206,6 +206,18 @@ export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
         )}
 
         {/* 이체 계좌 선택 (이체일 때만) */}
+        {isTransfer && accounts.length === 0 && !accountsLoading && (
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
+            <span className="text-[12px] text-amber-700">계좌가 없어요.</span>
+            <Link
+              to="/accounts"
+              onClick={handleClose}
+              className="text-[12px] font-medium text-indigo-600 hover:underline"
+            >
+              계좌 추가하기 →
+            </Link>
+          </div>
+        )}
         {isTransfer && accounts.length > 0 && (
           <>
             <div>
