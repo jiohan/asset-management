@@ -1,11 +1,17 @@
-// src/components/layout/AppLayout.jsx
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 import AppHeader from './AppHeader'
 import TransactionFormModal from '../transactions/TransactionFormModal'
+import { LedgerRefreshProvider, useLedgerRefresh } from '../../contexts/LedgerRefreshContext'
 
-export default function AppLayout({ children, title }) {
+function AppLayoutInner({ children, title }) {
   const [showModal, setShowModal] = useState(false)
+  const { triggerRefresh } = useLedgerRefresh()
+
+  function handleSuccess() {
+    setShowModal(false)
+    triggerRefresh()
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -19,8 +25,16 @@ export default function AppLayout({ children, title }) {
       <TransactionFormModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSuccess={() => setShowModal(false)}
+        onSuccess={handleSuccess}
       />
     </div>
+  )
+}
+
+export default function AppLayout({ children, title }) {
+  return (
+    <LedgerRefreshProvider>
+      <AppLayoutInner title={title}>{children}</AppLayoutInner>
+    </LedgerRefreshProvider>
   )
 }

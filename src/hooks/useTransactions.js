@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useTransactions(month) {
+export function useTransactions(month, refreshKey = 0) {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -9,7 +9,7 @@ export function useTransactions(month) {
   useEffect(() => {
     if (!month) return
 
-    async function fetch() {
+    async function load() {
       setLoading(true)
       setError(null)
 
@@ -41,13 +41,8 @@ export function useTransactions(month) {
       setTransactions(data)
     }
 
-    fetch()
-  }, [month])
+    load()
+  }, [month, refreshKey])
 
-  function refetch() {
-    setTransactions([])
-    setLoading(true)
-  }
-
-  return { transactions, loading, error, refetch }
+  return { transactions, loading, error }
 }
