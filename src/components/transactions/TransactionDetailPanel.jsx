@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useUpdateTransaction } from '../../hooks/useUpdateTransaction'
 import { useDeleteTransaction } from '../../hooks/useDeleteTransaction'
 import { useCategories } from '../../hooks/useCategories'
@@ -170,7 +171,16 @@ export default function TransactionDetailPanel({ transaction, onClose, onSaved, 
                 {accountsLoading ? (
                   <p className="text-[12px] text-gray-400">계좌 로딩 중…</p>
                 ) : accounts.length === 0 ? (
-                  <p className="text-[12px] text-amber-600">계좌가 없어요. 계좌 탭에서 추가해주세요.</p>
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
+                    <span className="text-[12px] text-amber-700">계좌가 없어요.</span>
+                    <Link
+                      to="/accounts"
+                      onClick={onClose}
+                      className="text-[12px] font-medium text-indigo-600 hover:underline"
+                    >
+                      계좌 추가하기 →
+                    </Link>
+                  </div>
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
                     {accounts.map(acc => (
@@ -229,7 +239,7 @@ export default function TransactionDetailPanel({ transaction, onClose, onSaved, 
                   <button onClick={onClose} className="btn btn-ghost text-[12px] h-8 px-3">취소</button>
                   <button
                     onClick={handleSave}
-                    disabled={!canSave || saving}
+                    disabled={!canSave || saving || accountsLoading}
                     className="btn btn-primary text-[12px] h-8 px-3 disabled:opacity-50"
                   >
                     {saving ? '저장 중…' : '저장'}
