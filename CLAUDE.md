@@ -54,3 +54,7 @@ src/
 - `docs/features.md` — MVP 기능 명세
 - `docs/design-system.md` — UI 색상·컴포넌트 패턴
 - `docs/phase.md` — 전체 개발 단계 순서 (Phase 1~9)
+
+## 금지사항
+- 직접 git 사용 금지
+
