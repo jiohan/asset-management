@@ -44,7 +44,7 @@ const NAV_ITEMS = [
   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onAddTransaction }) {
   const { session } = useAuth()
 
   const displayName = session?.user?.user_metadata?.display_name ?? ''
@@ -69,11 +69,11 @@ export default function Sidebar() {
         <span className="ml-auto text-[10px] text-gray-400 font-medium">v1</span>
       </div>
 
-      {/* 새 거래 추가 버튼 (Phase 5 전 비활성) */}
+      {/* 새 거래 추가 버튼 */}
       <div className="p-3">
         <button
-          disabled
-          className="w-full h-8 bg-indigo-600 text-white rounded-lg text-[13px] font-medium flex items-center justify-center gap-1.5 opacity-60 cursor-not-allowed"
+          onClick={onAddTransaction}
+          className="w-full h-8 bg-indigo-600 text-white rounded-lg text-[13px] font-medium flex items-center justify-center gap-1.5 hover:bg-indigo-700 transition-colors cursor-pointer"
         >
           <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5">
             <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
