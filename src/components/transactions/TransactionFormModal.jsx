@@ -24,7 +24,7 @@ export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
 
   const { session } = useAuth()
   const { categories } = useCategories()
-  const { accounts } = useAccounts()
+  const { accounts, loading: accountsLoading } = useAccounts()
   const { createTransaction, loading } = useCreateTransaction()
   const { createTransfer, loading: transferLoading } = useCreateTransfer()
 
@@ -73,7 +73,7 @@ export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
     const result = await createTransaction({
       userId: session?.user?.id,
       categoryId,
-      accountId: accountId ?? null,
+      accountId,
       amount: Number(amount),
       type,
       note: note.trim() || null,
@@ -268,7 +268,9 @@ export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
         {!isTransfer && (
           <div>
             <label className="block text-[12px] font-medium text-gray-500 mb-1.5">계좌</label>
-            {accounts.length === 0 ? (
+            {accountsLoading ? (
+              <div className="py-1.5 text-[12px] text-gray-400">계좌를 불러오는 중...</div>
+            ) : accounts.length === 0 ? (
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
                 <span className="text-[12px] text-amber-700">계좌가 없어요.</span>
                 <Link
