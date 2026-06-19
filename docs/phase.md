@@ -82,15 +82,16 @@ Sidebar, Header, PageLayout 컴포넌트 + React Router 라우팅 설정.
   잔액 공식: 수입 합계 − 지출 합계 + 이체 입금 합계 − 이체 출금 합계
 
   6-2: 계좌 CRUD 훅 추가
-  useCreateAccount(이름·타입·색상), useUpdateAccount, useDeleteAccount
-  삭제 시 연결 거래·이체 존재 여부 확인 → 존재하면 차단
+  useCreateAccount(이름·타입·색상·초기잔액), useUpdateAccount, useDeleteAccount
+  삭제 = 소프트 딜리트(is_active=false). useUpdateAccount는 is_active를 건드리지 않으므로 계좌 복원 기능이 필요해지면 별도 처리 필요.
 
   6-3: 계좌 목록 카드 UI
   계좌 카드 그리드 (색상 배지·계좌명·타입·잔액)
   전체 순자산 합계 헤더 카드, 잔액 양수(녹색)/음수(빨강) 색상 구분
 
   6-4: 계좌 추가 모달
-  계좌명 입력, 타입 선택(체크카드/신용카드/저축/현금), 색상 팔레트 선택
+  계좌명 입력, 타입 선택(체크카드/신용카드/저축/현금), 색상 팔레트 선택, 초기 잔액 입력
+  주의: 계좌 생성 후 거래 폼 드롭다운 자동 갱신을 위해 useAccounts.js에 refreshKey 추가 필요.
 
   6-5: 계좌 편집 · 삭제
   편집 버튼 → 기존 값 pre-fill 수정 모달

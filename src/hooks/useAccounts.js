@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useAccounts() {
+export function useAccounts(refreshKey = 0) {
   const [accounts, setAccounts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -14,6 +14,7 @@ export function useAccounts() {
       const { data, error } = await supabase
         .from('accounts')
         .select('*')
+        .eq('is_active', true)
         .order('name')
 
       setLoading(false)
@@ -27,7 +28,7 @@ export function useAccounts() {
     }
 
     fetch()
-  }, [])
+  }, [refreshKey])
 
   return { accounts, loading, error }
 }

@@ -30,8 +30,11 @@
 | name | text | 계좌 이름 (예: 카카오뱅크 체크) |
 | type | text | checking \| credit_card \| savings \| cash |
 | color | text | UI 구분용 hex 색상 (예: #6366f1) |
+| initial_balance | integer | 계좌 등록 시 입력한 초기 잔액 (기본값 0) — Phase 6 마이그레이션 추가 |
+| is_active | boolean | 소프트 딜리트 플래그 (기본값 true) — Phase 6 마이그레이션 추가 |
 
-> **계좌 잔액**: 별도 balance 컬럼 없음. transactions에서 합산해서 계산.
+> **계좌 잔액**: 별도 balance 컬럼 없음. `initial_balance + 수입 합계 − 지출 합계 + 이체 입금 − 이체 출금`으로 계산 (`useAccountsWithBalance` 훅).
+> **계좌 삭제**: hard delete 아님. `is_active = false` 소프트 딜리트. 연결 거래·이체 데이터는 보존됨.
 
 ---
 

@@ -10,17 +10,17 @@
 
 ## 기술 스택
 
-| 역할 | 기술 |
-|------|------|
-| 프론트엔드 | React + Vite, Tailwind CSS, Recharts, React Router |
-| 백엔드/DB | Supabase (PostgreSQL + Auth + REST API) |
-| 배포 | Vercel (프론트) + GitHub (소스 관리) |
-| 개발 도구 | Claude Code + VS Code |
+| 역할       | 기술                                                         |
+| ---------- | ------------------------------------------------------------ |
+| 프론트엔드 | React 18 + Vite 6, Tailwind CSS 4, Recharts, React Router 6  |
+| 백엔드/DB  | Supabase (PostgreSQL + Auth + RLS)                           |
+| 폰트       | Pretendard Variable (한글), JetBrains Mono (코드) — CDN 로드 |
+| 배포       | Vercel (프론트) + GitHub (소스 관리)                         |
 
 ## 개발 명령어
 
 ```bash
-npm run dev      # 개발 서버 시작 (localhost:5173)
+npm run dev      # 개발 서버 (localhost:5173)
 npm run build    # 프로덕션 빌드
 npm run preview  # 빌드 결과물 미리보기
 ```
@@ -29,32 +29,56 @@ npm run preview  # 빌드 결과물 미리보기
 
 ```
 src/
+├── App.jsx              # 라우팅 (BrowserRouter + PrivateRoute)
 ├── components/
-│   ├── ui/          # Button, Input, Badge, Modal 등 기본 요소
-│   └── layout/      # Header, Sidebar, PageLayout 등
-├── pages/           # 화면 단위 컴포넌트
-├── hooks/           # Supabase 쿼리 커스텀 훅
+│   ├── ui/              # Modal 등 기본 요소
+│   ├── layout/          # AppHeader, AppLayout, AuthLayout, Sidebar
+│   ├── accounts/        # AccountDetailPanel, AccountFormModal
+│   └── transactions/    # TransactionDetailPanel, TransactionFormModal
+├── contexts/            # AuthContext, LedgerRefreshContext
+├── pages/               # LandingPage, LoginPage, SignupPage, DashboardPage,
+│                        # LedgerPage, BudgetPage, AccountsPage
+├── hooks/               # Supabase 쿼리 커스텀 훅 (16개)
 ├── lib/
-│   └── supabase.js  # Supabase 클라이언트
-├── utils/           # 날짜·금액 포맷 유틸
-└── App.jsx          # 라우팅 설정
+│   └── supabase.js      # Supabase 클라이언트
+└── utils/               # accountColors.js, accountTypes.js
 ```
+
+## 라우팅 구조
+
+- 공개: `/` (Landing), `/login`, `/signup`
+- 보호: `/dashboard`, `/ledger`, `/budget`, `/accounts` → `PrivateRoute` + `AppLayout`
+
+## DB 스키마 (6 테이블, 모두 RLS 적용)
+
+`profiles` / `accounts` / `categories` / `transactions` / `transfers` / `budgets`
+
+- 계좌 잔액은 계산값 (저장 안 함): `initial_balance + 수입 − 지출 + 이체입금 − 이체출금`
+- 계좌 삭제는 소프트 삭제 (`is_active = false`)
+- 카테고리 프리셋은 공용 (`user_id = NULL`)
 
 ## 코딩 컨벤션
 
-- 컴포넌트 파일: `PascalCase.jsx`
-- 유틸/훅 파일: `camelCase.js`
-- Supabase 쿼리 로직은 반드시 `hooks/`에 작성 (페이지 컴포넌트에 직접 쓰지 않음)
+- 컴포넌트/Context: `PascalCase.jsx`
+- 훅/유틸: `camelCase.js`
+- Supabase 쿼리: 반드시 `hooks/`에 작성 (페이지·컴포넌트에 직접 쓰지 않음)
+- 컴포넌트는 도메인별 하위 폴더로 구성 (`accounts/`, `transactions/`, `layout/`, `ui/`)
 - 금액 표시: `amount.toLocaleString('ko-KR') + '원'`
 - 날짜 표시: `YYYY.MM.DD` 형식
 
-## 주요 문서 위치
+## 주요 문서
 
-- `docs/architecture.md` — DB 스키마, Supabase 테이블 구조
+- `docs/architecture.md` — DB 스키마 상세
 - `docs/features.md` — MVP 기능 명세
 - `docs/design-system.md` — UI 색상·컴포넌트 패턴
-- `docs/phase.md` — 전체 개발 단계 순서 (Phase 1~9)
+- `docs/phase.md` — 전체 개발 단계 (Phase 1~9)
+- `docs/build-logs/` — Phase별 빌드 로그
+
+## 빌드 로그 규칙
+
+Phase 완료 시 `docs/build-logs/phase{N}-build-log.md` 작성.  
+포함: AI 판단 근거, 수행 작업(생성/수정 파일), 채택하지 않은 대안과 이유.
 
 ## 금지사항
-- 직접 git 사용 금지
 
+- 직접 git 사용 금지

@@ -104,14 +104,6 @@ export default function Sidebar({ onAddTransaction }) {
           </NavLink>
         ))}
 
-        {/* 계좌 섹션 — 빈 상태 */}
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 mt-5 mb-1.5">
-          계좌
-        </p>
-        <div className="mx-1 px-3 py-3 border border-dashed border-gray-200 rounded-lg text-center">
-          <p className="text-[12px] text-gray-400">계좌가 없어요</p>
-          <p className="text-[11px] text-gray-300 mt-0.5">Phase 6에서 추가됩니다</p>
-        </div>
       </nav>
 
       {/* 유저 프로필 */}

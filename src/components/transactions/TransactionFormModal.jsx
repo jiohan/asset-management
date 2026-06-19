@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Modal from '../ui/Modal'
 import { useCategories } from '../../hooks/useCategories'
@@ -22,9 +22,15 @@ export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
   const [fromAccountId, setFromAccountId] = useState(null)
   const [toAccountId, setToAccountId] = useState(null)
 
+  const [accountsRefreshKey, setAccountsRefreshKey] = useState(0)
+
+  useEffect(() => {
+    if (isOpen) setAccountsRefreshKey(k => k + 1)
+  }, [isOpen])
+
   const { session } = useAuth()
   const { categories } = useCategories()
-  const { accounts, loading: accountsLoading } = useAccounts()
+  const { accounts, loading: accountsLoading } = useAccounts(accountsRefreshKey)
   const { createTransaction, loading } = useCreateTransaction()
   const { createTransfer, loading: transferLoading } = useCreateTransfer()
 
