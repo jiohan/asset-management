@@ -1,18 +1,25 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import AppHeader from './AppHeader'
 import TransactionFormModal from '../transactions/TransactionFormModal'
 import Modal from '../ui/Modal'
-import { LedgerRefreshProvider, useLedgerRefresh } from '../../contexts/LedgerRefreshContext'
 import { useAccounts } from '../../hooks/useAccounts'
 
-function AppLayoutInner({ children, title }) {
+const TITLE_MAP = {
+  '/dashboard': '대시보드',
+  '/ledger': '거래 내역',
+  '/budget': '예산',
+  '/accounts': '계좌',
+}
+
+export default function AppLayout() {
   const [showModal, setShowModal] = useState(false)
   const [showNoAccountModal, setShowNoAccountModal] = useState(false)
-  const { triggerRefresh } = useLedgerRefresh()
   const { accounts, loading: accountsLoading } = useAccounts()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const title = TITLE_MAP[pathname] || ''
 
   function handleAddTransaction() {
     if (!accountsLoading && accounts.length === 0) {
@@ -24,7 +31,6 @@ function AppLayoutInner({ children, title }) {
 
   function handleSuccess() {
     setShowModal(false)
-    triggerRefresh()
   }
 
   function handleGoToAccounts() {
@@ -38,7 +44,7 @@ function AppLayoutInner({ children, title }) {
       <div className="flex flex-col flex-1 min-w-0">
         <AppHeader title={title} />
         <main className="flex-1 min-h-0 flex flex-col">
-          {children}
+          <Outlet />
         </main>
       </div>
       <TransactionFormModal
@@ -69,13 +75,5 @@ function AppLayoutInner({ children, title }) {
         </div>
       </Modal>
     </div>
-  )
-}
-
-export default function AppLayout({ children, title }) {
-  return (
-    <LedgerRefreshProvider>
-      <AppLayoutInner title={title}>{children}</AppLayoutInner>
-    </LedgerRefreshProvider>
   )
 }

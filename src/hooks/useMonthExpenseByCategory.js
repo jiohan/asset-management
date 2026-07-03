@@ -1,50 +1,41 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
-export function useMonthExpenseByCategory(month, refreshKey = 0) {
-  const [expenseByCategory, setExpenseByCategory] = useState(new Map())
-  const [totalExpense, setTotalExpense] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (!month) return
-    async function load() {
-      setLoading(true)
-      setError(null)
+export function useMonthExpenseByCategory(month) {
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: ['month-expense', month],
+    queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setLoading(false); return }
+      if (!user) return { expenseByCategory: new Map(), totalExpense: 0 }
 
       const [y, m] = month.split('-').map(Number)
       const firstDay = `${month}-01`
-      const lastDay = new Date(y, m, 0).getDate()
-      const lastDayStr = `${month}-${String(lastDay).padStart(2, '0')}`
+      const lastDay = `${month}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`
 
-      const { data, error: err } = await supabase
+      const { data, error } = await supabase
         .from('transactions')
         .select('category_id, amount')
         .eq('type', 'expense')
         .gte('date', firstDay)
-        .lte('date', lastDayStr)
-
-      setLoading(false)
-      if (err) {
-        setError('지출 정보를 불러오지 못했습니다.')
-        return
-      }
+        .lte('date', lastDay)
+      if (error) throw new Error('지출 정보를 불러오지 못했습니다.')
 
       const map = new Map()
       let total = 0
       for (const row of data) {
-        const prev = map.get(row.category_id) ?? 0
-        map.set(row.category_id, prev + row.amount)
+        map.set(row.category_id, (map.get(row.category_id) ?? 0) + row.amount)
         total += row.amount
       }
-      setExpenseByCategory(map)
-      setTotalExpense(total)
-    }
-    load()
-  }, [month, refreshKey])
+      return { expenseByCategory: map, totalExpense: total }
+    },
+    enabled: !!month,
+    staleTime: 2 * 60 * 1000,
+  })
 
-  return { expenseByCategory, totalExpense, loading, error }
+  return {
+    expenseByCategory: data?.expenseByCategory ?? new Map(),
+    totalExpense: data?.totalExpense ?? 0,
+    loading,
+    error: error?.message ?? null,
+  }
 }

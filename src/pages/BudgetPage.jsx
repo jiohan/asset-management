@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-import { useLedgerRefresh } from '../contexts/LedgerRefreshContext'
 import { useMonthBudgetData } from '../hooks/useMonthBudgetData'
 import { useMonthExpenseByCategory } from '../hooks/useMonthExpenseByCategory'
 import TotalBudgetModal from '../components/budget/TotalBudgetModal'
@@ -41,22 +40,27 @@ function CategoryBudgetRow({ budget, expense, onClick }) {
 
   return (
     <div
-      className={`px-5 py-3.5 cursor-pointer hover:bg-[#fafbff] transition-colors ${isOver ? 'bg-red-50' : ''}`}
+      className={`px-5 py-3.5 cursor-pointer hover:bg-[#fafbff] transition-colors duration-150 ${isOver ? 'bg-red-50' : ''}`}
       onClick={onClick}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-[18px] w-6 shrink-0">{budget.categoryIcon}</span>
         <span className="flex-1 text-[13px] font-medium text-gray-800">{budget.categoryName}</span>
-        <span className="mono text-[13px] font-semibold text-gray-900">
-          {budget.amount.toLocaleString('ko-KR')}원
-        </span>
+        <div className="flex items-baseline gap-1 shrink-0">
+          <span className="mono text-[13px] font-semibold" style={{ color: barColor }}>
+            {expense.toLocaleString('ko-KR')}원
+          </span>
+          <span className="mono text-[13px] text-gray-400">
+            / {budget.amount.toLocaleString('ko-KR')}원
+          </span>
+        </div>
       </div>
       <div className="ml-9 space-y-1.5">
         <div className="b-bar">
           <span style={{ width: `${Math.min(pct * 100, 100)}%`, background: barColor }} />
         </div>
-        <div className="flex justify-between text-[11px] text-gray-400">
-          <span className="mono">{expense.toLocaleString('ko-KR')} / {budget.amount.toLocaleString('ko-KR')}</span>
+        <div className="flex justify-between text-[12px] text-gray-600">
+          <span className="mono">{expense.toLocaleString('ko-KR')}원 사용</span>
           <span className={`font-medium ${isOver ? 'text-red-500' : ''}`}>
             {isOver
               ? `${Math.abs(remaining).toLocaleString('ko-KR')}원 초과`
@@ -94,8 +98,8 @@ function OtherBudgetRow({ otherBudget, otherExpense, totalBudget }) {
           <div className="b-bar">
             <span style={{ width: `${Math.min(pct * 100, 100)}%`, background: barColor }} />
           </div>
-          <div className="flex justify-between text-[11px] text-gray-400">
-            <span className="mono">{otherExpense.toLocaleString('ko-KR')} / {otherBudget.toLocaleString('ko-KR')}</span>
+          <div className="flex justify-between text-[12px] text-gray-600">
+            <span className="mono">{otherExpense.toLocaleString('ko-KR')}원 사용</span>
           </div>
         </div>
       )}
@@ -107,8 +111,8 @@ function TotalBudgetCard({ totalBudget, totalExpense, onEdit }) {
   if (totalBudget === 0) {
     return (
       <div className="card p-6 flex flex-col items-center gap-3">
-        <p className="text-[14px] text-gray-500">이번 달 예산이 설정되지 않았어요</p>
-        <button className="btn btn-primary" onClick={onEdit}>예산 설정</button>
+        <p className="text-[14px] text-gray-500">이번 달 목표 예산을 설정해보세요</p>
+        <button className="btn btn-primary" onClick={onEdit}>목표 예산 설정</button>
       </div>
     )
   }
@@ -122,22 +126,30 @@ function TotalBudgetCard({ totalBudget, totalExpense, onEdit }) {
   return (
     <div className="card">
       <div className="card-h">
-        <h3>이번 달 예산</h3>
+        <h3>이번 달 목표 예산</h3>
         <div className="ml-auto">
           <button className="btn btn-ghost text-[12px]" onClick={onEdit}>수정</button>
         </div>
       </div>
-      <div className="p-5 space-y-3">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[13px] text-gray-500">
-            <span className="mono text-[20px] font-bold text-gray-900">{totalBudget.toLocaleString('ko-KR')}</span>
-            원 중{' '}
-            <span className="mono text-[16px] font-semibold" style={{ color: barColor }}>
-              {totalExpense.toLocaleString('ko-KR')}
-            </span>
-            원 사용
-          </span>
-          <span className="text-[13px] font-semibold" style={{ color: barColor }}>{pctDisplay}%</span>
+      <div className="p-5 space-y-4">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[12px] text-gray-400 mb-1">이번 달 지출</p>
+            <div className="flex items-baseline gap-1">
+              <span className="mono text-[26px] font-bold leading-none" style={{ color: barColor }}>
+                {totalExpense.toLocaleString('ko-KR')}
+              </span>
+              <span className="text-[14px] font-medium text-gray-500">원</span>
+            </div>
+          </div>
+          <div className="text-right shrink-0 pb-0.5">
+            <p className="mono text-[22px] font-bold leading-none" style={{ color: barColor }}>
+              {pctDisplay}%
+            </p>
+            <p className="text-[12px] text-gray-400 mt-1">
+              목표 <span className="mono">{totalBudget.toLocaleString('ko-KR')}</span>원
+            </p>
+          </div>
         </div>
 
         <div className="gauge">
@@ -152,10 +164,10 @@ function TotalBudgetCard({ totalBudget, totalExpense, onEdit }) {
           />
         </div>
 
-        <p className={`text-[13px] font-medium ${isOver ? 'text-red-500' : 'text-gray-500'}`}>
+        <p className={`text-[13px] font-medium ${isOver ? 'text-red-500' : 'text-gray-400'}`}>
           {isOver
-            ? `${Math.abs(remaining).toLocaleString('ko-KR')}원 초과`
-            : `${remaining.toLocaleString('ko-KR')}원 남음`}
+            ? `목표보다 ${Math.abs(remaining).toLocaleString('ko-KR')}원 초과했어요`
+            : `${remaining.toLocaleString('ko-KR')}원 더 쓸 수 있어요`}
         </p>
       </div>
     </div>
@@ -168,9 +180,8 @@ export default function BudgetPage() {
   const [showTotalModal, setShowTotalModal] = useState(false)
   const [editingCategoryBudget, setEditingCategoryBudget] = useState(null)
 
-  const { refreshKey, triggerRefresh } = useLedgerRefresh()
-  const { totalBudget, categoryBudgets, isCarriedOver, loading, error } = useMonthBudgetData(month, refreshKey)
-  const { expenseByCategory, totalExpense, loading: expLoading } = useMonthExpenseByCategory(month, refreshKey)
+  const { totalBudget, categoryBudgets, isCarriedOver, loading, error } = useMonthBudgetData(month)
+  const { expenseByCategory, totalExpense, loading: expLoading } = useMonthExpenseByCategory(month)
   const isLoading = loading || expLoading
 
   const sumCategoryBudgets = useMemo(
@@ -193,14 +204,13 @@ export default function BudgetPage() {
   function handleMutationComplete() {
     setShowTotalModal(false)
     setEditingCategoryBudget(null)
-    triggerRefresh()
   }
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Month navigation header */}
       <div className="h-14 border-b border-gray-100 bg-white flex items-center px-6 gap-3 shrink-0">
-        <button className="btn btn-ghost px-1.5" onClick={() => setMonth(prevMonth(month))}>
+        <button className="btn btn-ghost px-1.5 active:scale-[0.97]" onClick={() => setMonth(prevMonth(month))}>
           <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gray-500" stroke="currentColor" strokeWidth="2">
             <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
@@ -208,7 +218,7 @@ export default function BudgetPage() {
         <span className="text-[15px] font-semibold text-gray-900 min-w-[110px] text-center">
           {formatMonthLabel(month)}
         </span>
-        <button className="btn btn-ghost px-1.5" onClick={() => setMonth(nextMonth(month))}>
+        <button className="btn btn-ghost px-1.5 active:scale-[0.97]" onClick={() => setMonth(nextMonth(month))}>
           <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gray-500" stroke="currentColor" strokeWidth="2">
             <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>

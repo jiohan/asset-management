@@ -1,34 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export function useCategories() {
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    async function fetch() {
-      setLoading(true)
-      setError(null)
-
+  const { data: categories = [], isLoading: loading, error } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
         .order('type')
         .order('name')
-
-      setLoading(false)
-
-      if (error) {
-        setError('카테고리를 불러오지 못했습니다.')
-        return
-      }
-
-      setCategories(data)
-    }
-
-    fetch()
-  }, [])
-
-  return { categories, loading, error }
+      if (error) throw new Error('카테고리를 불러오지 못했습니다.')
+      return data
+    },
+    staleTime: 30 * 60 * 1000,
+  })
+  return { categories, loading, error: error?.message ?? null }
 }

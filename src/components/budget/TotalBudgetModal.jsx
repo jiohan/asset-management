@@ -76,7 +76,7 @@ export default function TotalBudgetModal({ isOpen, onClose, month, initialAmount
 
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
           <button type="button" onClick={onClose} className="btn btn-ghost">취소</button>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button type="submit" className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={loading}>
             {loading && (
               <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>

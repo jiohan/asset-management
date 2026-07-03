@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react'
 import { useTransactions } from '../hooks/useTransactions'
 import { useMonthBudget } from '../hooks/useMonthBudget'
 import { useAccounts } from '../hooks/useAccounts'
+import { useAccountsWithBalance } from '../hooks/useAccountsWithBalance'
 import { useCategories } from '../hooks/useCategories'
-import { useLedgerRefresh } from '../contexts/LedgerRefreshContext'
 import { useTransfers } from '../hooks/useTransfers'
 import TransactionDetailPanel from '../components/transactions/TransactionDetailPanel'
 
@@ -91,6 +91,7 @@ function normalizeTransfers(transfers) {
     from_account: tr.from_account,
     to_account: tr.to_account,
     _isTransfer: true,
+    _isCardPayment: tr.type === 'card_payment',
   }))
 }
 
@@ -113,11 +114,11 @@ const TYPE_TABS = [
 export default function LedgerPage() {
   const todayYM = getToday()
   const [month, setMonth] = useState(todayYM)
-  const { refreshKey, triggerRefresh } = useLedgerRefresh()
-  const { transactions, loading, error } = useTransactions(month, refreshKey)
-  const { transfers, loading: trLoading, error: trError } = useTransfers(month, refreshKey)
+  const { transactions, loading, error } = useTransactions(month)
+  const { transfers, loading: trLoading, error: trError } = useTransfers(month)
   const { monthlyBudget } = useMonthBudget()
   const { accounts } = useAccounts()
+  const { accounts: accountsWithBalance } = useAccountsWithBalance()
   const { categories } = useCategories()
 
   const [typeFilter, setTypeFilter] = useState('all')
@@ -136,12 +137,10 @@ export default function LedgerPage() {
 
   function handlePanelSaved() {
     setSelectedTx(null)
-    triggerRefresh()
   }
 
   function handlePanelDeleted() {
     setSelectedTx(null)
-    triggerRefresh()
   }
 
   const hasActiveFilter = typeFilter !== 'all' || accountFilter !== '' || categoryFilter !== ''
@@ -168,6 +167,11 @@ export default function LedgerPage() {
   const summary = useMemo(
     () => computeSummary(transactions, monthlyBudget ?? 0),
     [transactions, monthlyBudget]
+  )
+
+  const netWorth = useMemo(
+    () => accountsWithBalance.reduce((s, a) => s + a.balance, 0),
+    [accountsWithBalance]
   )
 
   const visibleCategories = useMemo(() => {
@@ -230,6 +234,11 @@ export default function LedgerPage() {
       <div className="px-6 py-4 border-b border-gray-200 shrink-0">
         <div className="grid grid-cols-4 gap-3">
           <SummaryCard
+            label="현재 총 자산"
+            value={`${netWorth < 0 ? '−' : ''}${Math.abs(netWorth).toLocaleString('ko-KR')}원`}
+            valueClass={netWorth < 0 ? 'text-red-500' : 'text-gray-900'}
+          />
+          <SummaryCard
             label="이번 달 수입"
             value={`+${summary.totalIncome.toLocaleString('ko-KR')}원`}
             valueClass="text-blue-500"
@@ -259,11 +268,6 @@ export default function LedgerPage() {
               <span className="text-[14px] text-gray-400">예산 미설정</span>
             )}
           </div>
-          <SummaryCard
-            label="순자산 변화"
-            value={`${summary.netChange >= 0 ? '+' : '−'}${Math.abs(summary.netChange).toLocaleString('ko-KR')}원`}
-            valueClass={summary.netChange >= 0 ? 'text-gray-900' : 'text-red-500'}
-          />
         </div>
       </div>
 
@@ -428,10 +432,12 @@ export default function LedgerPage() {
                     <div className="w-[180px] flex items-center gap-2.5 shrink-0">
                       {tx._isTransfer ? (
                         <>
-                          <span className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-[16px] shrink-0 leading-none">
-                            ↔
+                          <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-[16px] shrink-0 leading-none ${tx._isCardPayment ? 'bg-red-50' : 'bg-purple-50'}`}>
+                            {tx._isCardPayment ? '💳' : '↔'}
                           </span>
-                          <span className="text-[13px] font-medium text-gray-500 truncate">이체</span>
+                          <span className="text-[13px] font-medium text-gray-500 truncate">
+                            {tx._isCardPayment ? '대금 납부' : '이체'}
+                          </span>
                         </>
                       ) : (
                         <>

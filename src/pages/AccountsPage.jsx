@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useAccountsWithBalance } from '../hooks/useAccountsWithBalance'
 import { useDeleteAccount } from '../hooks/useDeleteAccount'
-import { useLedgerRefresh } from '../contexts/LedgerRefreshContext'
-import { ACCOUNT_TYPE_LABELS } from '../utils/accountTypes'
+import { ACCOUNT_TYPE_LABELS, ACCOUNT_TYPE_COLORS } from '../utils/accountTypes'
 import AccountFormModal from '../components/accounts/AccountFormModal'
 import AccountDetailPanel from '../components/accounts/AccountDetailPanel'
+import CardPaymentModal from '../components/accounts/CardPaymentModal'
 import { supabase } from '../lib/supabase'
 
 function formatAmount(n) {
@@ -12,8 +12,6 @@ function formatAmount(n) {
 }
 
 export default function AccountsPage() {
-  const [localRefreshKey, setLocalRefreshKey] = useState(0)
-  const { refreshKey: globalRefreshKey } = useLedgerRefresh()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [editingAccount, setEditingAccount] = useState(null)
   const [selectedAccount, setSelectedAccount] = useState(null)
@@ -21,27 +19,29 @@ export default function AccountsPage() {
   const [deleteBlocked, setDeleteBlocked] = useState(false)
   const [deleteBlockMsg, setDeleteBlockMsg] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [payTargetAccount, setPayTargetAccount] = useState(null)
 
-  const { accounts, loading, error } = useAccountsWithBalance(localRefreshKey + globalRefreshKey)
+  const { accounts, loading, error } = useAccountsWithBalance()
   const { deleteAccount } = useDeleteAccount()
 
-  const { totalAssets, totalLiabilities, netWorth } = useMemo(() => {
+  const { totalAssets, totalLiabilities, netWorth, groupedAccounts } = useMemo(() => {
     const assets = accounts
       .filter(a => a.type !== 'credit_card')
       .reduce((s, a) => s + a.balance, 0)
     const liabilities = accounts
       .filter(a => a.type === 'credit_card')
       .reduce((s, a) => s + a.balance, 0)
-    return { totalAssets: assets, totalLiabilities: liabilities, netWorth: assets + liabilities }
+    const TYPE_ORDER = ['checking', 'savings', 'cash', 'credit_card']
+    const grouped = TYPE_ORDER
+      .map(type => ({ type, accounts: accounts.filter(a => a.type === type) }))
+      .filter(g => g.accounts.length > 0)
+    return { totalAssets: assets, totalLiabilities: liabilities, netWorth: assets + liabilities, groupedAccounts: grouped }
   }, [accounts])
 
   function handleCreated() {
-    setLocalRefreshKey(k => k + 1)
   }
 
   function handleUpdated() {
-    setLocalRefreshKey(k => k + 1)
-    // Keep the selected panel in sync by refreshing the accounts list
     setSelectedAccount(null)
   }
 
@@ -71,7 +71,6 @@ export default function AccountsPage() {
     if (ok) {
       setDeleteTarget(null)
       setSelectedAccount(null)
-      setLocalRefreshKey(k => k + 1)
     }
   }
 
@@ -96,11 +95,15 @@ export default function AccountsPage() {
             <p className="text-[12px] text-gray-400 mt-1">원</p>
           </div>
           <div className="px-6 py-5">
-            <p className="text-[12px] font-medium text-gray-500 mb-1.5">총 부채</p>
+            <div className="text-[12px] font-medium text-gray-500 mb-1.5">
+              총 부채
+              <span className="ml-1.5 text-[11px] text-gray-400 font-normal">미결제 카드 대금</span>
+            </div>
             <p className={`mono text-[24px] font-bold leading-none ${totalLiabilities < 0 ? 'text-red-500' : 'text-gray-400'}`}>
-              {loading ? '—' : (totalLiabilities < 0 ? `−${formatAmount(totalLiabilities)}` : formatAmount(totalLiabilities))}
+              {loading ? '—' : formatAmount(totalLiabilities)}
             </p>
             <p className="text-[12px] text-gray-400 mt-1">원</p>
+            <p className="text-[11px] text-gray-400 mt-1.5">카드 사용 후 미납 합계</p>
           </div>
           <div className="px-6 py-5">
             <p className="text-[12px] font-medium text-gray-500 mb-1.5">순자산</p>
@@ -108,6 +111,7 @@ export default function AccountsPage() {
               {loading ? '—' : (netWorth < 0 ? `−${formatAmount(netWorth)}` : formatAmount(netWorth))}
             </p>
             <p className="text-[12px] text-gray-400 mt-1">원</p>
+            <p className="text-[11px] text-gray-400 mt-1.5">= 자산 − 부채</p>
           </div>
         </div>
       </div>
@@ -145,17 +149,36 @@ export default function AccountsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
-          {accounts.map(account => (
-            <AccountCard
-              key={account.id}
-              account={account}
-              isSelected={selectedAccount?.id === account.id}
-              onCardClick={() => setSelectedAccount(account)}
-              onEditClick={e => { e.stopPropagation(); setEditingAccount(account) }}
-              onDeleteClick={e => { e.stopPropagation(); handleDeleteClick(account) }}
-            />
-          ))}
+        <div className="space-y-6">
+          {groupedAccounts.map(({ type, accounts: typeAccounts }) => {
+            const subtotal = typeAccounts.reduce((s, a) => s + a.balance, 0)
+            return (
+              <div key={type}>
+                <div className="flex items-center mb-3">
+                  <span className={`text-[11px] font-semibold uppercase tracking-wider ${ACCOUNT_TYPE_COLORS[type].text}`}>
+                    {ACCOUNT_TYPE_LABELS[type]}
+                  </span>
+                  <span className="ml-1.5 text-[11px] text-gray-400">{typeAccounts.length}개</span>
+                  <div className="flex-1 h-px bg-gray-200 mx-3" />
+                  <span className={`mono text-[12px] font-semibold ${subtotal < 0 ? 'text-red-500' : 'text-gray-700'}`}>
+                    {subtotal < 0 ? `−${formatAmount(subtotal)}` : formatAmount(subtotal)}원
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {typeAccounts.map(account => (
+                    <AccountCard
+                      key={account.id}
+                      account={account}
+                      isSelected={selectedAccount?.id === account.id}
+                      onCardClick={() => setSelectedAccount(account)}
+                      onEditClick={e => { e.stopPropagation(); setEditingAccount(account) }}
+                      onDeleteClick={e => { e.stopPropagation(); handleDeleteClick(account) }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
 
@@ -224,6 +247,15 @@ export default function AccountsPage() {
           handleDeleteClick(selectedAccountFresh)
           setSelectedAccount(null)
         }}
+        onPayClick={() => setPayTargetAccount(selectedAccountFresh)}
+      />
+
+      {/* 신용카드 대금 납부 모달 */}
+      <CardPaymentModal
+        isOpen={!!payTargetAccount}
+        cardAccount={payTargetAccount}
+        onClose={() => setPayTargetAccount(null)}
+        onSuccess={handleCreated}
       />
     </div>
   )
@@ -273,12 +305,22 @@ function AccountCard({ account, isSelected, onCardClick, onEditClick, onDeleteCl
             </button>
           </div>
         </div>
-        <div className="flex items-baseline gap-1">
-          <span className={`mono text-[22px] font-bold leading-none ${isNegative ? 'text-red-500' : 'text-gray-900'}`}>
-            {isNegative ? `−${formatAmount(account.balance)}` : formatAmount(account.balance)}
-          </span>
-          <span className="text-[13px] text-gray-400">원</span>
-        </div>
+        {account.type === 'credit_card' ? (
+          <div className="flex items-baseline gap-1">
+            <span className="mono text-[22px] font-bold leading-none text-red-500">
+              {formatAmount(account.balance)}
+            </span>
+            <span className="text-[13px] text-red-400">원</span>
+            <span className="text-[11px] text-red-300 ml-0.5">미결제</span>
+          </div>
+        ) : (
+          <div className="flex items-baseline gap-1">
+            <span className={`mono text-[22px] font-bold leading-none ${isNegative ? 'text-red-500' : 'text-gray-900'}`}>
+              {isNegative ? `−${formatAmount(account.balance)}` : formatAmount(account.balance)}
+            </span>
+            <span className="text-[13px] text-gray-400">원</span>
+          </div>
+        )}
       </div>
     </div>
   )

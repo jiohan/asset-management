@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 function prevMonthStr(ym) {
@@ -26,62 +26,48 @@ function shapeBudgets(rows, nullifyId = false) {
   return { totalBudget, categoryBudgets }
 }
 
-export function useMonthBudgetData(month, refreshKey = 0) {
-  const [totalBudget, setTotalBudget] = useState(0)
-  const [categoryBudgets, setCategoryBudgets] = useState([])
-  const [isCarriedOver, setIsCarriedOver] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (!month) return
-    async function load() {
-      setLoading(true)
-      setError(null)
+export function useMonthBudgetData(month) {
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: ['month-budget-data', month],
+    queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setLoading(false); return }
+      if (!user) return { totalBudget: 0, categoryBudgets: [], isCarriedOver: false }
 
-      const { data, error: err } = await supabase
+      const { data, error } = await supabase
         .from('budgets')
         .select('*, categories(id, name, icon)')
         .eq('user_id', user.id)
         .eq('month', month)
-
-      if (err) {
-        setError('예산 정보를 불러오지 못했습니다.')
-        setLoading(false)
-        return
-      }
+      if (error) throw new Error('예산 정보를 불러오지 못했습니다.')
 
       if (data.length > 0) {
-        const shaped = shapeBudgets(data, false)
-        setTotalBudget(shaped.totalBudget)
-        setCategoryBudgets(shaped.categoryBudgets)
-        setIsCarriedOver(false)
-      } else {
-        const prev = prevMonthStr(month)
-        const { data: prevData, error: prevErr } = await supabase
-          .from('budgets')
-          .select('*, categories(id, name, icon)')
-          .eq('user_id', user.id)
-          .eq('month', prev)
-
-        if (!prevErr && prevData.length > 0) {
-          const shaped = shapeBudgets(prevData, true)
-          setTotalBudget(shaped.totalBudget)
-          setCategoryBudgets(shaped.categoryBudgets)
-          setIsCarriedOver(true)
-        } else {
-          setTotalBudget(0)
-          setCategoryBudgets([])
-          setIsCarriedOver(false)
-          if (prevErr) setError('예산 정보를 불러오지 못했습니다.')
-        }
+        return { ...shapeBudgets(data, false), isCarriedOver: false }
       }
-      setLoading(false)
-    }
-    load()
-  }, [month, refreshKey])
 
-  return { totalBudget, categoryBudgets, isCarriedOver, loading, error }
+      const prev = prevMonthStr(month)
+      const { data: prevData, error: prevErr } = await supabase
+        .from('budgets')
+        .select('*, categories(id, name, icon)')
+        .eq('user_id', user.id)
+        .eq('month', prev)
+      if (prevErr) throw new Error('예산 정보를 불러오지 못했습니다.')
+
+      if (prevData.length > 0) {
+        return { ...shapeBudgets(prevData, true), isCarriedOver: true }
+      }
+
+      return { totalBudget: 0, categoryBudgets: [], isCarriedOver: false }
+    },
+    enabled: !!month,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const defaultData = { totalBudget: 0, categoryBudgets: [], isCarriedOver: false }
+  return {
+    totalBudget: data?.totalBudget ?? defaultData.totalBudget,
+    categoryBudgets: data?.categoryBudgets ?? defaultData.categoryBudgets,
+    isCarriedOver: data?.isCarriedOver ?? defaultData.isCarriedOver,
+    loading,
+    error: error?.message ?? null,
+  }
 }

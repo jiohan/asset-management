@@ -33,7 +33,7 @@ function formatAmt(n) {
   return Math.abs(n).toLocaleString('ko-KR')
 }
 
-export default function AccountDetailPanel({ account, onClose, onEdit, onDelete }) {
+export default function AccountDetailPanel({ account, onClose, onEdit, onDelete, onPayClick }) {
   const isOpen = !!account
   const [month, setMonth] = useState(getToday)
   const [detailRefresh] = useState(0)
@@ -138,6 +138,23 @@ export default function AccountDetailPanel({ account, onClose, onEdit, onDelete 
               </div>
             </div>
 
+            {/* 신용카드 미결제 잔액 배너 */}
+            {account.type === 'credit_card' && (
+              <div className="px-4 py-3 bg-red-50 border-b border-red-100 shrink-0">
+                <p className="text-[11px] text-red-400 mb-0.5">현재 미결제 잔액</p>
+                <p className="mono text-[20px] font-bold text-red-500 leading-none">
+                  {formatAmt(account.balance)}원
+                </p>
+                <p className="text-[11px] text-red-300 mt-1">카드 결제 후 0원이 됩니다</p>
+                <button
+                  onClick={onPayClick}
+                  className="mt-2 text-[11px] font-medium text-white bg-red-400 hover:bg-red-500 px-3 py-1.5 rounded-md transition-colors duration-150"
+                >
+                  납부 기록하기
+                </button>
+              </div>
+            )}
+
             {/* Month Nav */}
             <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100 shrink-0">
               <button
@@ -174,14 +191,20 @@ export default function AccountDetailPanel({ account, onClose, onEdit, onDelete 
 
             {/* Summary */}
             <div className="px-4 py-3 grid grid-cols-2 gap-x-4 gap-y-1.5 border-b border-gray-100 shrink-0">
+              {summary.income > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-gray-400">
+                    {account.type === 'credit_card' ? '기타 입금' : '수입'}
+                  </span>
+                  <span className="text-[12px] font-medium text-blue-500 mono">
+                    +{formatAmt(summary.income)}원
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-gray-400">수입</span>
-                <span className="text-[12px] font-medium text-blue-500 mono">
-                  +{formatAmt(summary.income)}원
+                <span className="text-[11px] text-gray-400">
+                  {account.type === 'credit_card' ? '카드 사용' : '지출'}
                 </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-gray-400">지출</span>
                 <span className="text-[12px] font-medium text-red-500 mono">
                   −{formatAmt(summary.expense)}원
                 </span>
@@ -189,7 +212,9 @@ export default function AccountDetailPanel({ account, onClose, onEdit, onDelete 
               {(summary.transferIn > 0 || summary.transferOut > 0) && (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-gray-400">이체 입금</span>
+                    <span className="text-[11px] text-gray-400">
+                      {account.type === 'credit_card' ? '카드 결제' : '이체 입금'}
+                    </span>
                     <span className="text-[12px] font-medium text-teal-500 mono">
                       +{formatAmt(summary.transferIn)}원
                     </span>
@@ -267,14 +292,18 @@ function TxRow({ tx }) {
 
 function TransferRow({ transfer, accountId }) {
   const isOut = transfer.from_account_id === accountId
+  const isCardPayment = transfer.type === 'card_payment'
   const counterparty = isOut ? transfer.to_account : transfer.from_account
+
+  const label = isCardPayment
+    ? (isOut ? '대금 납부 출금' : '대금 납부 입금')
+    : (isOut ? '이체 출금' : '이체 입금')
+
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 hover:bg-gray-50 transition-colors duration-100">
-      <span className="text-[16px] leading-none shrink-0">{isOut ? '→' : '←'}</span>
+      <span className="text-[16px] leading-none shrink-0">{isCardPayment ? '💳' : (isOut ? '→' : '←')}</span>
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-gray-800 truncate">
-          이체 {isOut ? '출금' : '입금'}
-        </p>
+        <p className="text-[12px] font-medium text-gray-800 truncate">{label}</p>
         <div className="flex items-center gap-1 mt-0.5">
           {counterparty?.color && (
             <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: counterparty.color }} />

@@ -11,7 +11,7 @@ function getToday() {
   return new Date().toISOString().split('T')[0]
 }
 
-export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
+export default function TransactionFormModal({ isOpen, onClose, onSuccess, initialType, initialToAccountId }) {
   const [type, setType] = useState('expense')
   const [amount, setAmount] = useState('')
   const [categoryId, setCategoryId] = useState(null)
@@ -25,7 +25,11 @@ export default function TransactionFormModal({ isOpen, onClose, onSuccess }) {
   const [accountsRefreshKey, setAccountsRefreshKey] = useState(0)
 
   useEffect(() => {
-    if (isOpen) setAccountsRefreshKey(k => k + 1)
+    if (isOpen) {
+      setType(initialType || 'expense')
+      setToAccountId(initialToAccountId || null)
+      setAccountsRefreshKey(k => k + 1)
+    }
   }, [isOpen])
 
   const { session } = useAuth()

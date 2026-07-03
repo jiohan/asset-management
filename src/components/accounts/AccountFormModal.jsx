@@ -5,6 +5,7 @@ import { useUpdateAccount } from '../../hooks/useUpdateAccount'
 import { useAuth } from '../../contexts/AuthContext'
 import { ACCOUNT_COLORS } from '../../utils/accountColors'
 import { ACCOUNT_TYPE_LABELS, ACCOUNT_TYPE_COLORS } from '../../utils/accountTypes'
+import { useAccounts } from '../../hooks/useAccounts'
 
 const TYPES = ['checking', 'credit_card', 'savings', 'cash']
 
@@ -19,8 +20,12 @@ export default function AccountFormModal({ isOpen, onClose, onCreated, onUpdated
   const [type, setType] = useState('checking')
   const [color, setColor] = useState(ACCOUNT_COLORS[0])
   const [initialBalance, setInitialBalance] = useState('')
+  const [paymentAccountId, setPaymentAccountId] = useState(null)
   const [nameError, setNameError] = useState('')
   const [submitError, setSubmitError] = useState('')
+
+  const { accounts: allAccounts } = useAccounts()
+  const nonCardAccounts = allAccounts.filter(a => a.type !== 'credit_card' && a.id !== account?.id)
 
   useEffect(() => {
     if (isOpen) {
@@ -28,14 +33,15 @@ export default function AccountFormModal({ isOpen, onClose, onCreated, onUpdated
         setName(account.name)
         setType(account.type)
         setColor(account.color ?? ACCOUNT_COLORS[0])
-        // initial_balance is stored as negative for credit_card
         const raw = Math.abs(account.initial_balance ?? 0)
         setInitialBalance(raw === 0 ? '' : String(raw))
+        setPaymentAccountId(account.payment_account_id ?? null)
       } else {
         setName('')
         setType('checking')
         setColor(ACCOUNT_COLORS[0])
         setInitialBalance('')
+        setPaymentAccountId(null)
       }
       setNameError('')
       setSubmitError('')
@@ -71,6 +77,7 @@ export default function AccountFormModal({ isOpen, onClose, onCreated, onUpdated
         type,
         color,
         initialBalance: finalBalance,
+        paymentAccountId: type === 'credit_card' ? (paymentAccountId ?? null) : null,
       })
       if (result) {
         onUpdated?.()
@@ -85,6 +92,7 @@ export default function AccountFormModal({ isOpen, onClose, onCreated, onUpdated
         type,
         color,
         initialBalance: finalBalance,
+        paymentAccountId: type === 'credit_card' ? (paymentAccountId ?? null) : null,
       })
       if (result) {
         onCreated?.()
@@ -186,6 +194,27 @@ export default function AccountFormModal({ isOpen, onClose, onCreated, onUpdated
               ))}
             </div>
           </div>
+
+          {/* 결제 계좌 (신용카드 전용) */}
+          {type === 'credit_card' && (
+            <div>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">
+                결제 계좌
+              </label>
+              <p className="text-[11px] text-gray-400 mb-1.5">카드값이 빠져나가는 통장을 지정하면 납부 시 자동 선택돼요</p>
+              <select
+                value={paymentAccountId ?? ''}
+                onChange={e => setPaymentAccountId(e.target.value || null)}
+                className="field w-full"
+                style={{ height: '32px', paddingLeft: '10px', paddingRight: '10px', fontSize: '13px' }}
+              >
+                <option value="">선택 안 함</option>
+                {nonCardAccounts.map(a => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* 초기 잔액 */}
           <div>

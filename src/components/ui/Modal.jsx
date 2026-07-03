@@ -13,7 +13,7 @@ export default function Modal({ isOpen, onClose, children }) {
   return (
     <div
       data-testid="modal-overlay"
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-150
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-200 ease-out
         ${isOpen
           ? 'bg-black/40 backdrop-blur-sm pointer-events-auto'
           : 'bg-transparent backdrop-blur-none pointer-events-none'
@@ -22,7 +22,7 @@ export default function Modal({ isOpen, onClose, children }) {
     >
       <div
         className={`w-[480px] max-w-[90vw] bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]
-          transition-all duration-150
+          transition-all duration-200 ease-out
           ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
         onClick={e => e.stopPropagation()}
       >

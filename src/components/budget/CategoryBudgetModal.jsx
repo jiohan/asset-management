@@ -69,7 +69,7 @@ export default function CategoryBudgetModal({
 
   async function handleDelete() {
     if (!budgetEntry?.id) return
-    const ok = await deleteCategoryBudget({ id: budgetEntry.id })
+    const ok = await deleteCategoryBudget({ id: budgetEntry.id, month })
     if (!ok) {
       setSubmitError('삭제하지 못했습니다. 다시 시도해주세요.')
       return
@@ -159,7 +159,7 @@ export default function CategoryBudgetModal({
           {isEdit && budgetEntry?.id != null && (
             <button
               type="button"
-              className="btn btn-ghost btn-danger mr-auto"
+              className="btn btn-ghost btn-danger mr-auto disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleDelete}
               disabled={deleting}
             >
@@ -168,7 +168,7 @@ export default function CategoryBudgetModal({
           )}
           <div className="ml-auto flex gap-2">
             <button type="button" onClick={onClose} className="btn btn-ghost">취소</button>
-            <button type="submit" className="btn btn-primary" disabled={saving || deleting}>
+            <button type="submit" className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={saving || deleting}>
               {saving && (
                 <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
